@@ -1,0 +1,13 @@
+{
+  "name": "{{name}}",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "dkit run -- node src/index.js",
+    "start": "dkit run -- node src/index.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pg": "^8.23.0"
+  }
+}

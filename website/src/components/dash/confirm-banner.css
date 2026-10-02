@@ -1,0 +1,158 @@
+/* Type-to-confirm banner — terminal-styled destructive-action confirmation.
+   Layout is a small dialog: head row (icon + label + close), hint line, then
+   the $ prompt row. Motion rides the transitions.dev tokens: panel entrance
+   (rise + fade + blur), wrong input shakes on --distance-small.
+
+   Focus: feedback is RED inside the banner. The shell-wide green focus floor
+   uses :focus-visible on inputs; because the prompt input autofocuses, that
+   ring would light up on open — so :focus/:focus-visible on the input are
+   explicitly suppressed (!important) and the prompt row carries the focus
+   state via :focus-within instead. */
+
+.confirm-banner {
+  grid-column: 1 / -1; /* full width when the parent is a table-row grid */
+  margin: 0.6rem 0 0.35rem;
+  padding: 0.85rem 1rem 0.95rem;
+  border: 1px solid rgba(255, 92, 92, 0.45);
+  border-radius: var(--r, 8px);
+  background: rgba(255, 92, 92, 0.06);
+  animation: confirmBannerIn var(--duration-fast) var(--ease-smooth-out) backwards;
+}
+
+/* head row */
+.confirm-banner-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+.confirm-banner-icon {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 92, 92, 0.45);
+  border-radius: var(--r, 6px);
+  color: var(--danger, #ff5c5c);
+}
+.confirm-banner-label {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--danger, #ff5c5c);
+}
+.confirm-banner-close {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--r, 6px);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.confirm-banner-close:hover { color: var(--text); background: var(--surface-raised); }
+
+/* hint */
+.confirm-banner-hint {
+  margin: 0 0 0.7rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* prompt row: $ + input + delete button */
+.confirm-banner-prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: calc(var(--ctl-h, 34px) + 8px);
+  padding: 0 0.45rem 0 0.8rem;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r, 6px);
+}
+.confirm-banner-prompt:focus-within {
+  border-color: var(--danger, #ff5c5c);
+  box-shadow: 0 0 0 1px rgba(255, 92, 92, 0.3);
+}
+.confirm-banner-prompt.is-wrong {
+  border-color: var(--danger, #ff5c5c);
+  animation: confirmShake var(--duration-fast) var(--ease-smooth-out);
+}
+
+.confirm-banner-ps1 {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--danger, #ff5c5c);
+  flex-shrink: 0;
+}
+
+.confirm-banner-prompt input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0 !important;
+  background: none !important;
+  padding: 0 !important;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text);
+  outline: none !important;
+}
+/* Kill the shell-wide green focus ring on this autofocused input. */
+.confirm-banner-prompt input:focus,
+.confirm-banner-prompt input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.confirm-banner-prompt input::placeholder {
+  color: var(--danger, #ff5c5c);
+  opacity: 0.75;
+}
+
+.confirm-banner-run {
+  flex-shrink: 0;
+  height: calc(var(--ctl-h, 34px) - 0.5rem);
+  padding: 0 0.9rem;
+  border: 1px solid var(--danger, #ff5c5c);
+  border-radius: calc(var(--r, 6px) - 2px);
+  background: rgba(255, 92, 92, 0.12);
+  color: var(--danger, #ff5c5c);
+  font: 600 0.78rem/1 var(--font-sans, inherit);
+  cursor: pointer;
+}
+.confirm-banner-run:hover { background: rgba(255, 92, 92, 0.22); }
+.confirm-banner-run:focus-visible {
+  outline: 2px solid var(--danger, #ff5c5c);
+  outline-offset: 1px;
+}
+
+@keyframes confirmBannerIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--distance-base));
+    filter: blur(var(--blur-small));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes confirmShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(calc(-1 * var(--distance-small, 6px))); }
+  75% { transform: translateX(var(--distance-small, 6px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-banner,
+  .confirm-banner-prompt.is-wrong { animation: none; }
+}

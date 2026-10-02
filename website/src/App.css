@@ -1,0 +1,8 @@
+.app {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* `clip` doesn't turn .app into a scroll container, so the sticky navbar keeps working */
+@supports (overflow: clip) {
+  .app { overflow-x: clip; }
+}

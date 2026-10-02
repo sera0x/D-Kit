@@ -1,0 +1,123 @@
+/* Changelog — Dashboard visual language */
+
+.changelog-container {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+
+.changelog-list {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.changelog-list::before {
+  content: '';
+  position: absolute;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  left: 0.45rem;
+  width: 1px;
+  background: var(--border);
+}
+
+.changelog-entry {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.changelog-entry:last-child {
+  margin-bottom: 0;
+}
+
+.changelog-entry::before {
+  content: '';
+  position: absolute;
+  top: 1.4rem;
+  left: -1.4rem;
+  width: 0.65rem;
+  height: 0.65rem;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--accent-dim);
+  transform: translateX(0.1rem);
+}
+
+.changelog-card {
+  padding: 1.25rem 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color var(--duration-quick) var(--ease-out), transform var(--duration-quick) var(--ease-smooth-out);
+}
+
+.changelog-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.changelog-entry-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 0.9rem;
+}
+
+/* Version tags are data-ish — keep mono, drop the green badge treatment. */
+.changelog-version {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+}
+
+.changelog-entry h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.changelog-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.changelog-items li {
+  position: relative;
+  padding-left: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.changelog-items li:last-child {
+  margin-bottom: 0;
+}
+
+.changelog-items li::before {
+  content: '';
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 0.35rem;
+  height: 0.35rem;
+  background: var(--text-muted);
+  border-radius: 50%;
+}
+
+@media (max-width: 54rem) {
+  .changelog-card {
+    padding: 1.1rem 1rem;
+  }
+}

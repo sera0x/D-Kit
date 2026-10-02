@@ -1,0 +1,131 @@
+/* Status page — public /status route. Uses the app-shell tokens from
+   index.css (--surface, --border, --text, --text-muted, --accent) plus the
+   error/warn palette already used across dashboard.css (#ff6b6b / #ffb020)
+   and the .status-pill component defined in dashboard.css. */
+
+.status-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  max-width: 56rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.status-hero { display: flex; flex-direction: column; gap: 0.8rem; }
+.status-hero h1 { margin: 0; }
+.status-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+.status-banner.ok { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+.status-banner.err { border-color: color-mix(in srgb, #ff6b6b 45%, var(--border)); }
+.status-banner.warn { border-color: color-mix(in srgb, #ffb020 40%, var(--border)); }
+.status-banner-meta { font-weight: 400; color: var(--text-muted); font-size: 0.8rem; }
+
+.status-services { display: flex; flex-direction: column; gap: 0.7rem; }
+
+.status-service {
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--surface);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.status-service.down { border-color: color-mix(in srgb, #ff6b6b 45%, var(--border)); }
+
+.status-service-head { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; }
+.status-service-name { display: flex; align-items: center; gap: 0.55rem; }
+.status-service-state { font-size: 0.8rem; font-weight: 600; }
+.status-service-state.ok { color: var(--accent); }
+.status-service-state.err { color: #ff6b6b; }
+.status-service-state.warn { color: #ffb020; }
+.status-service-state.off { color: var(--text-muted); }
+
+.status-manual-chip {
+  font-size: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  color: var(--text-muted);
+}
+
+.status-service-desc { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+.status-service-meta { color: var(--text-muted); font-size: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.status-incidents { display: flex; flex-direction: column; gap: 0.8rem; }
+.status-incidents h2 { margin: 0; font-size: 1.05rem; }
+
+.status-incident {
+  border: 1px solid color-mix(in srgb, #ff6b6b 35%, var(--border));
+  border-radius: 0.8rem;
+  background: var(--surface);
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.status-incident.resolved { border-color: var(--border); opacity: 0.85; }
+
+.status-incident-head { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.status-incident-title { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 0; }
+.status-inc-svc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.status-chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+}
+.status-chip.ok { background: var(--accent-soft); color: var(--accent); }
+.status-chip.err { background: rgba(255, 107, 107, 0.08); color: #ff6b6b; }
+.status-chip.warn { background: rgba(255, 176, 32, 0.08); color: #ffb020; }
+.status-chip.ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+
+.status-updates { display: flex; flex-direction: column; gap: 0.55rem; }
+.status-update { display: flex; gap: 0.6rem; align-items: flex-start; }
+.status-update .status-pill { margin-top: 0.3rem; }
+.status-update p { margin: 0; font-size: 0.88rem; }
+.status-update time { color: var(--text-muted); font-size: 0.72rem; }
+
+.status-no-incidents {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent);
+  border: 1px dashed var(--border);
+  border-radius: 0.8rem;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.9rem;
+}
+
+.spin { animation: status-spin 0.9s linear infinite; }
+@keyframes status-spin { to { transform: rotate(360deg); } }
+@keyframes status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.status-service.down .status-pill.err { animation: status-pulse 1.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .spin, .status-service.down .status-pill.err { animation: none; }
+}
+
+@media (max-width: 48rem) {
+  .status-service, .status-incident { padding: 0.8rem 0.9rem; }
+}

@@ -1,0 +1,202 @@
+/* Docs — Dashboard visual language */
+
+.docs-container {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+
+.docs-lead {
+  margin: 0 0 1.75rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.docs-block {
+  margin-bottom: 1rem;
+  padding: 1.35rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color var(--duration-quick) var(--ease-out), transform var(--duration-quick) var(--ease-smooth-out);
+}
+
+.docs-block:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.docs-block:last-child {
+  margin-bottom: 0;
+}
+
+.docs-block h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-block h2 span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.docs-block h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--text);
+}
+
+.docs-block p,
+.docs-block li {
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.docs-block ol,
+.docs-block ul {
+  padding-left: 1.4rem;
+  margin: 0.75rem 0;
+}
+
+.docs-block li {
+  margin-bottom: 0.5rem;
+}
+
+.docs-block code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  color: var(--text);
+}
+
+.docs-block a {
+  color: var(--accent);
+}
+
+.docs-code {
+  position: relative;
+  margin: 0.9rem 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.docs-code pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.docs-copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+
+.docs-copy:hover {
+  border-color: var(--border-strong);
+}
+
+.docs-table-wrap {
+  overflow-x: auto;
+  margin: 0.9rem 0;
+}
+
+.docs-table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.docs-table th,
+.docs-table td {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.docs-table th {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+}
+
+/* CLI commands are data — mono stays; neutral text color instead of green. */
+.docs-table td:first-child {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.docs-table td {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.docs-note {
+  margin: 0.9rem 0 0;
+  padding: 0.85rem 1rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.docs-cta {
+  text-align: center;
+  padding: 2.25rem 1.5rem;
+}
+
+.docs-cta h2 {
+  justify-content: center;
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 1.25rem;
+}
+
+.docs-cta h2 span {
+  display: none;
+}
+
+@media (max-width: 54rem) {
+  .docs-block {
+    padding: 1.1rem 1rem;
+  }
+
+  .docs-code pre {
+    font-size: 0.78rem;
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "dkit-cli",
+  "version": "0.1.0",
+  "description": "D-Kit CLI - secrets, scaffolding, cron jobs, uptime monitors, and log shipping from one command",
+  "license": "MIT",
+  "bin": {
+    "dkit": "./bin/dkit.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "templates",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/excelottah6/D-Kit.git"
+  },
+  "homepage": "https://github.com/excelottah6/D-Kit#readme",
+  "bugs": "https://github.com/excelottah6/D-Kit/issues",
+  "keywords": [
+    "dkit",
+    "cli",
+    "secrets",
+    "env",
+    "cron",
+    "monitoring",
+    "logs"
+  ],
+  "dependencies": {
+    "axios": "^1.20.0",
+    "chalk": "^4.1.2",
+    "commander": "^15.0.0",
+    "dotenv": "^17.4.2",
+    "inquirer": "^8.2.5",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
