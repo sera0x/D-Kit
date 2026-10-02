@@ -2,12 +2,14 @@ import React from 'react';
 import GradientWaves from '../ui/GradientWaves';
 import Shuffle from '../ui/Shuffle';
 import { useAuth } from '../../context/AuthContext';
+import { HomeThemeContext } from '../app/HomeShell';
 import './sections.css';
 const CTA = ({ onNavigate }) => {
 const { user } = useAuth();
+const theme = React.useContext(HomeThemeContext);
 return (
 <section className="cta-section" id="pricing">
-<div className="cta-background"><GradientWaves horizonColor="#050606" waveColor="#0f1a13" crestColor="#39ff88" speed={0.2} amplitude={1.5} opacity={0.5} /></div>
+<div className="cta-background"><GradientWaves key={theme} horizonColor={theme === 'light' ? '#ffffff' : '#050606'} waveColor={theme === 'light' ? '#e4f3ea' : '#0f1a13'} crestColor={theme === 'light' ? '#0a8447' : '#39ff88'} speed={0.2} amplitude={1.5} opacity={0.5} /></div>
 <div className="cta-content">
 <Shuffle text="Create an account" shuffleDirection="up" duration={0.4} shuffleTimes={2} triggerOnce={true} triggerOnHover={true} tag="h2" textAlign="center" />
 <p className="cta-sub">Free while in beta. No card required.</p>

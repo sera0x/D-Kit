@@ -15,6 +15,7 @@ import Status from './pages/Status';
 import NotFound from './pages/NotFound';
 import Changelog from './pages/Changelog';
 import AcceptInvite from './pages/AcceptInvite';
+import HomeShell from './components/app/HomeShell';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import SuspendedNotice from './components/ui/SuspendedNotice';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -86,7 +87,7 @@ case '/changelog': return <Changelog onNavigate={navigate} />;
 case '/accept-invite': return <AcceptInvite onNavigate={navigate} />;
 case '/suspended': return <SuspendedNotice onNavigate={navigate} />;
 case '/dashboard': if (!token) return null; return <Dashboard onNavigate={navigate} />;
-case '/': return (<><Hero onNavigate={navigate} /><Features /><TerminalDemo /><CTA onNavigate={navigate} /></>);
+case '/': return (<HomeShell><Hero onNavigate={navigate} /><Features /><TerminalDemo /><CTA onNavigate={navigate} /><Footer onNavigate={navigate} currentPath={currentPath} /></HomeShell>);
 default: return <NotFound onNavigate={navigate} />;
 }
 };
@@ -94,7 +95,7 @@ return (
 <div className="app" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', color: 'var(--text)' }}>
 {!isAppShellPage && !isHomePage && <ErrorBoundary><Navbar onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
 <ErrorBoundary>{renderRoute()}</ErrorBoundary>
-{!isAppShellPage && <ErrorBoundary><Footer onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
+{!isAppShellPage && !isHomePage && <ErrorBoundary><Footer onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
 </div>
 );
 }

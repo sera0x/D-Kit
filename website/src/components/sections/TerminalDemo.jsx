@@ -1,16 +1,19 @@
 import React from 'react';
 import { Terminal } from '../ui/Terminal';
 import SlicedWaves from '../ui/SlicedWaves';
+import { HomeThemeContext } from '../app/HomeShell';
 import './sections.css';
 
 const TerminalDemo = () => {
+  const theme = React.useContext(HomeThemeContext);
   return (
     <section className="terminal-section" id="demo">
       <div className="terminal-background">
         <SlicedWaves
-          color1="#39ff88"
-          color2="#1f9955"
-          color3="#0b3a20"
+          key={theme}
+          color1={theme === 'light' ? '#0a8447' : '#39ff88'}
+          color2={theme === 'light' ? '#57c98d' : '#1f9955'}
+          color3={theme === 'light' ? '#dcf2e4' : '#0b3a20'}
           columns={12}
           rows={6}
           barThickness={0.15}

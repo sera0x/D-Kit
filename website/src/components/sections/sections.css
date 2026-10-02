@@ -1,4 +1,14 @@
 
+/* Homepage theme toggle (HomeShell): fixed bottom-right so it never collides
+   with the floating brand / login buttons at the top of the hero. */
+.home-theme-btn {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 50;
+  background: var(--surface);
+}
+
 .hero-section {
   position: relative;
   /* No navbar above the hero any more, so it fills the whole first screen */
@@ -149,6 +159,27 @@
 
 .hero-terminal-wrap .terminal-window {
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Light-mode fixes for home components that hardcode dark assumptions.
+   The hero glow and canvas waves read as smudges on white, so they quiet
+   down; the CTA gets white text on the darker green (same as the dashboard's
+   light-mode buttons) and flips its hover to the dimmer green. */
+.home-shell[data-theme='light'] .cta-button {
+  color: #ffffff;
+}
+
+.home-shell[data-theme='light'] .hero-glow {
+  opacity: 0.32;
+}
+
+.home-shell[data-theme='light'] .hero-terminal-wrap .terminal-window {
+  box-shadow: 0 20px 60px -28px rgba(16, 20, 16, 0.25);
+}
+
+.home-shell[data-theme='light'] .cta-button:hover {
+  background: var(--accent-dim);
+  color: #ffffff;
 }
 
 @media (max-width: 60rem) {
