@@ -2,11 +2,11 @@ import React from 'react';
 import GradientWaves from '../ui/GradientWaves';
 import Shuffle from '../ui/Shuffle';
 import { useAuth } from '../../context/AuthContext';
-import { HomeThemeContext } from '../app/HomeShell';
+import { MarketingThemeContext } from '../app/MarketingShell';
 import './sections.css';
 const CTA = ({ onNavigate }) => {
 const { user } = useAuth();
-const theme = React.useContext(HomeThemeContext);
+const theme = React.useContext(MarketingThemeContext);
 return (
 <section className="cta-section" id="pricing">
 <div className="cta-background"><GradientWaves key={theme} horizonColor={theme === 'light' ? '#ffffff' : '#050606'} waveColor={theme === 'light' ? '#e4f3ea' : '#0f1a13'} crestColor={theme === 'light' ? '#0a8447' : '#39ff88'} speed={0.2} amplitude={1.5} opacity={0.5} /></div>

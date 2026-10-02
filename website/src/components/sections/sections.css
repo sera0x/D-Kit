@@ -1,7 +1,7 @@
 
-/* Homepage theme toggle (HomeShell): fixed bottom-right so it never collides
-   with the floating brand / login buttons at the top of the hero. */
-.home-theme-btn {
+/* Marketing theme toggle (MarketingShell): fixed bottom-right so it never
+   collides with the floating brand / login buttons at the top of the hero. */
+.marketing-theme-btn {
   position: fixed;
   bottom: 1.25rem;
   right: 1.25rem;
@@ -161,23 +161,33 @@
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
 }
 
-/* Light-mode fixes for home components that hardcode dark assumptions.
-   The hero glow and canvas waves read as smudges on white, so they quiet
-   down; the CTA gets white text on the darker green (same as the dashboard's
+/* Light-mode fixes for marketing components that hardcode dark assumptions.
+   The WebGL orb draws neon particles for a black canvas, so on white it reads
+   as a washed smudge — light mode swaps it for a CSS aura tuned for white.
+   The CTA gets white text on the darker green (same as the dashboard's
    light-mode buttons) and flips its hover to the dimmer green. */
-.home-shell[data-theme='light'] .cta-button {
+.marketing-shell[data-theme='light'] .cta-button {
   color: #ffffff;
 }
 
-.home-shell[data-theme='light'] .hero-glow {
-  opacity: 0.32;
+.marketing-shell[data-theme='light'] .hero-glow {
+  opacity: 0.9;
 }
 
-.home-shell[data-theme='light'] .hero-terminal-wrap .terminal-window {
+.hero-aura {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(38% 46% at 32% 40%, rgba(10, 132, 71, 0.20), transparent 70%),
+    radial-gradient(30% 36% at 55% 28%, rgba(18, 183, 106, 0.14), transparent 72%),
+    radial-gradient(46% 52% at 66% 62%, rgba(10, 132, 71, 0.08), transparent 74%);
+}
+
+.marketing-shell[data-theme='light'] .hero-terminal-wrap .terminal-window {
   box-shadow: 0 20px 60px -28px rgba(16, 20, 16, 0.25);
 }
 
-.home-shell[data-theme='light'] .cta-button:hover {
+.marketing-shell[data-theme='light'] .cta-button:hover {
   background: var(--accent-dim);
   color: #ffffff;
 }

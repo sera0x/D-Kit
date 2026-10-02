@@ -96,20 +96,21 @@ input::placeholder, textarea::placeholder {
    always left untouched. */
 .dash-shell[data-theme='light'] .dash-side-logo,
 .dash-shell[data-theme='light'] .dash-topbar-brand img,
-.home-shell[data-theme='light'] .navbar-logo {
+.marketing-shell[data-theme='light'] .navbar-logo {
   filter: invert(1);
 }
 
-/* The homepage is wrapped in .home-shell (HomeShell.jsx), which carries the
-   same data-theme switch and dkit_theme storage key as the dashboard shell.
-   It paints its own --bg so transparent sections (the hero) never show the
-   dark :root canvas behind it. */
-.home-shell {
+/* Every marketing page (home, login, signup, password reset) is wrapped in
+   .marketing-shell (MarketingShell.jsx), which carries the same data-theme
+   switch and dkit_theme storage key as the dashboard shell. It paints its own
+   --bg so transparent sections (the hero) never show the dark :root canvas
+   behind it. */
+.marketing-shell {
   background: var(--bg);
   min-height: 100vh;
   color: var(--text);
 }
-.home-shell[data-theme='light'] {
+.marketing-shell[data-theme='light'] {
   --bg: #ffffff;
   --surface: #f7f8f7;
   --surface-raised: #eef0ec;

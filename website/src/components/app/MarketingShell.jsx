@@ -3,8 +3,8 @@ import { Sun, Moon } from 'lucide-react';
 import { applyChromeTheme, nudgeBrowserChrome } from '../../lib/browserChrome';
 
 // Same storage key as AppShell, so the preference carries between the
-// homepage and the dashboard/docs shell in both directions.
-export const HomeThemeContext = React.createContext('dark');
+// marketing pages and the dashboard/docs shell in both directions.
+export const MarketingThemeContext = React.createContext('dark');
 
 function useTheme() {
   const [theme, setTheme] = useState(() => {
@@ -17,7 +17,10 @@ function useTheme() {
   return [theme, toggle];
 }
 
-export default function HomeShell({ children }) {
+// Wraps every marketing page (home, login, signup, password reset) so they all
+// carry one data-theme switch, one toggle button, and one chrome treatment —
+// the marketing counterpart to AppShell.
+export default function MarketingShell({ children }) {
   const [theme, toggleTheme] = useTheme();
 
   useLayoutEffect(() => { applyChromeTheme(theme); }, [theme]);
@@ -30,11 +33,11 @@ export default function HomeShell({ children }) {
   }, [theme]);
 
   return (
-    <HomeThemeContext.Provider value={theme}>
-      <div className="home-shell" data-theme={theme}>
+    <MarketingThemeContext.Provider value={theme}>
+      <div className="marketing-shell" data-theme={theme}>
         {children}
         <button
-          className="icon-btn home-theme-btn"
+          className="icon-btn marketing-theme-btn"
           onClick={toggleTheme}
           aria-label="Toggle color theme"
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -42,6 +45,6 @@ export default function HomeShell({ children }) {
           {theme === 'dark' ? <Sun width="16" height="16" /> : <Moon width="16" height="16" />}
         </button>
       </div>
-    </HomeThemeContext.Provider>
+    </MarketingThemeContext.Provider>
   );
 }

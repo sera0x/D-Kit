@@ -1,11 +1,11 @@
 import React from 'react';
 import { Terminal } from '../ui/Terminal';
 import SlicedWaves from '../ui/SlicedWaves';
-import { HomeThemeContext } from '../app/HomeShell';
+import { MarketingThemeContext } from '../app/MarketingShell';
 import './sections.css';
 
 const TerminalDemo = () => {
-  const theme = React.useContext(HomeThemeContext);
+  const theme = React.useContext(MarketingThemeContext);
   return (
     <section className="terminal-section" id="demo">
       <div className="terminal-background">

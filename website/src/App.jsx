@@ -15,7 +15,7 @@ import Status from './pages/Status';
 import NotFound from './pages/NotFound';
 import Changelog from './pages/Changelog';
 import AcceptInvite from './pages/AcceptInvite';
-import HomeShell from './components/app/HomeShell';
+import MarketingShell from './components/app/MarketingShell';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import SuspendedNotice from './components/ui/SuspendedNotice';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -74,12 +74,13 @@ const isKnownPath = KNOWN_PATHS.includes(currentPath);
 const isAppShellPage = APP_SHELL_PATHS.includes(currentPath) || !isKnownPath;
 // The homepage has no navbar: its CTAs and footer cover navigation, and it keeps the top of the page clean
 const isHomePage = currentPath === '/';
+const isAuthPage = ['/login', '/signup', '/forgot-password', '/reset-password'].includes(currentPath);
 const renderRoute = () => {
 switch (currentPath) {
-case '/login': return <Login onNavigate={navigate} />;
-case '/signup': return <Signup onNavigate={navigate} />;
-case '/forgot-password': return <ForgotPassword onNavigate={navigate} />;
-case '/reset-password': return <ResetPassword onNavigate={navigate} />;
+case '/login': return <MarketingShell><Navbar onNavigate={navigate} currentPath={currentPath} /><Login onNavigate={navigate} /><Footer onNavigate={navigate} currentPath={currentPath} /></MarketingShell>;
+case '/signup': return <MarketingShell><Navbar onNavigate={navigate} currentPath={currentPath} /><Signup onNavigate={navigate} /><Footer onNavigate={navigate} currentPath={currentPath} /></MarketingShell>;
+case '/forgot-password': return <MarketingShell><Navbar onNavigate={navigate} currentPath={currentPath} /><ForgotPassword onNavigate={navigate} /></MarketingShell>;
+case '/reset-password': return <MarketingShell><Navbar onNavigate={navigate} currentPath={currentPath} /><ResetPassword onNavigate={navigate} /></MarketingShell>;
 case '/oauth/callback': return <OAuthCallback onNavigate={navigate} />;
 case '/docs': return <Docs onNavigate={navigate} />;
 case '/status': return <Status onNavigate={navigate} />;
@@ -87,15 +88,15 @@ case '/changelog': return <Changelog onNavigate={navigate} />;
 case '/accept-invite': return <AcceptInvite onNavigate={navigate} />;
 case '/suspended': return <SuspendedNotice onNavigate={navigate} />;
 case '/dashboard': if (!token) return null; return <Dashboard onNavigate={navigate} />;
-case '/': return (<HomeShell><Hero onNavigate={navigate} /><Features /><TerminalDemo /><CTA onNavigate={navigate} /><Footer onNavigate={navigate} currentPath={currentPath} /></HomeShell>);
+case '/': return (<MarketingShell><Hero onNavigate={navigate} /><Features /><TerminalDemo /><CTA onNavigate={navigate} /><Footer onNavigate={navigate} currentPath={currentPath} /></MarketingShell>);
 default: return <NotFound onNavigate={navigate} />;
 }
 };
 return (
 <div className="app" style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', color: 'var(--text)' }}>
-{!isAppShellPage && !isHomePage && <ErrorBoundary><Navbar onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
+{!isAppShellPage && !isHomePage && !isAuthPage && <ErrorBoundary><Navbar onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
 <ErrorBoundary>{renderRoute()}</ErrorBoundary>
-{!isAppShellPage && !isHomePage && <ErrorBoundary><Footer onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
+{!isAppShellPage && !isHomePage && !isAuthPage && <ErrorBoundary><Footer onNavigate={navigate} currentPath={currentPath} /></ErrorBoundary>}
 </div>
 );
 }
