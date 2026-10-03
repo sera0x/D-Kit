@@ -163,30 +163,17 @@
 }
 
 /* Light-mode fixes for marketing components that hardcode dark assumptions.
-   The WebGL orb paints neon on black, so on white it reads as a washed smudge;
-   light mode swaps it for the CSS aura below. The glow wrapper also drops its
-   mask here, since the mask fades the aura out before the gradients get going.
-   The CTA gets white text on the darker green, like the dashboard's light
-   buttons, and flips its hover to the dimmer green. */
+   The orb takes care of light backgrounds itself: same shader, white backdrop,
+   it mixes its own light-color path. The glow wrapper only gets a small
+   opacity bump so the green tint stays readable on white. The CTA gets white
+   text on the darker green, like the dashboard's light buttons, and flips its
+   hover to the dimmer green. */
 .marketing-shell[data-theme='light'] .cta-button {
   color: #ffffff;
 }
 
 .marketing-shell[data-theme='light'] .hero-glow {
-  opacity: 1;
-  mask-image: none;
-}
-
-/* The aura replaces the orb in light mode. Alphas run higher than feels
-   natural because green washes out fast on white; under ~0.12 it disappears
-   into the page background entirely. */
-.hero-aura {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(42% 50% at 30% 38%, rgba(10, 132, 71, 0.30), transparent 68%),
-    radial-gradient(34% 40% at 58% 30%, rgba(87, 201, 141, 0.18), transparent 70%),
-    radial-gradient(50% 56% at 64% 64%, rgba(10, 132, 71, 0.12), transparent 72%);
+  opacity: 0.85;
 }
 
 .marketing-shell[data-theme='light'] .hero-terminal-wrap .terminal-window {

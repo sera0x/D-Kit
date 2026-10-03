@@ -17,9 +17,10 @@ return (
 <section className="hero-section" id="top">
 <button className="navbar-brand hero-brand-btn" onClick={() => (onNavigate ? onNavigate("/") : (window.location.href = "/"))}><img src={logo} alt="" className="navbar-logo" /><span>D-Kit</span></button>
 <button className="cta-button ghost hero-account-btn" onClick={() => { const t = user ? "/dashboard" : "/login"; onNavigate ? onNavigate(t) : (window.location.href = t); }}>{user ? "dashboard" : "dkit login"}</button>
-<div className="hero-glow">{theme === 'light'
-  ? <div className="hero-aura" aria-hidden="true" />
-  : <Orb hue={151} hoverIntensity={0.5} rotateOnHover={true} backgroundColor="#000000" />}</div>
+<div className="hero-glow">
+  <Orb hue={151} hoverIntensity={0.5} rotateOnHover={true}
+    backgroundColor={theme === 'light' ? '#ffffff' : '#000000'} />
+</div>
 <div className="hero-grid">
 <div className="hero-copy hero-seq">
 <Shuffle text="Secrets, scaffolding, one CLI." shuffleDirection="right" duration={0.5} shuffleTimes={2} ease="power3.out" triggerOnce={true} triggerOnHover={true} tag="h1" textAlign="left" />
