@@ -26,6 +26,7 @@
   z-index: 0;
   opacity: 0.55;
   mask-image: radial-gradient(60% 60% at 30% 40%, black, transparent);
+  pointer-events: none;
 }
 
 .hero-grid {
@@ -162,25 +163,30 @@
 }
 
 /* Light-mode fixes for marketing components that hardcode dark assumptions.
-   The WebGL orb draws neon particles for a black canvas, so on white it reads
-   as a washed smudge — light mode swaps it for a CSS aura tuned for white.
-   The CTA gets white text on the darker green (same as the dashboard's
-   light-mode buttons) and flips its hover to the dimmer green. */
+   The WebGL orb paints neon on black, so on white it reads as a washed smudge;
+   light mode swaps it for the CSS aura below. The glow wrapper also drops its
+   mask here, since the mask fades the aura out before the gradients get going.
+   The CTA gets white text on the darker green, like the dashboard's light
+   buttons, and flips its hover to the dimmer green. */
 .marketing-shell[data-theme='light'] .cta-button {
   color: #ffffff;
 }
 
 .marketing-shell[data-theme='light'] .hero-glow {
-  opacity: 0.9;
+  opacity: 1;
+  mask-image: none;
 }
 
+/* The aura replaces the orb in light mode. Alphas run higher than feels
+   natural because green washes out fast on white; under ~0.12 it disappears
+   into the page background entirely. */
 .hero-aura {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(38% 46% at 32% 40%, rgba(10, 132, 71, 0.20), transparent 70%),
-    radial-gradient(30% 36% at 55% 28%, rgba(18, 183, 106, 0.14), transparent 72%),
-    radial-gradient(46% 52% at 66% 62%, rgba(10, 132, 71, 0.08), transparent 74%);
+    radial-gradient(42% 50% at 30% 38%, rgba(10, 132, 71, 0.30), transparent 68%),
+    radial-gradient(34% 40% at 58% 30%, rgba(87, 201, 141, 0.18), transparent 70%),
+    radial-gradient(50% 56% at 64% 64%, rgba(10, 132, 71, 0.12), transparent 72%);
 }
 
 .marketing-shell[data-theme='light'] .hero-terminal-wrap .terminal-window {
@@ -358,12 +364,12 @@
   margin: 0 0 2.5rem;
 }
 
-.terminal-content > div:last-child {
+/* The Terminal component draws its own window (black in both themes), so only
+   alignment and type come from here. This rule used to restyle the window with
+   a themed background, which painted it light gray in light mode while the
+   terminal text stayed near-white: invisible demo. */
+.terminal-content .terminal-window {
   text-align: left;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1.5rem;
   font-family: var(--font-mono);
   font-size: 0.85rem;
 }
