@@ -291,11 +291,9 @@ requests.post(
         <div className="docs-block">
           <h2>Troubleshooting</h2>
           <ul>
-            <li><strong>"Could not send the ... email"</strong>: sending is handled by Resend from dkit.name.ng. Check spam, wait a minute and try again. If it persists, the domain verification may still be propagating.</li>
             <li><strong>Cron job never fires</strong>: schedules are UTC strings like <code>5m</code>, <code>daily 09:30</code>. Check <code>dkit cron:runs &lt;name&gt;</code> for the recorded error; jobs whose URL is unreachable show <code>error: …</code>.</li>
             <li><strong>Monitor says down but the site works</strong>: two consecutive failures mark a monitor down. Check the recorded status code; a 4xx/5xx counts as down.</li>
             <li><strong>Logs missing</strong>: retention is 7 days, and ingest needs the <code>x-api-key</code> header. <code>dkit logs:ship "test"</code> then <code>dkit logs:tail</code> verifies the pipe end-to-end.</li>
-            <li><strong>"Too many attempts. Please try again in a few minutes."</strong>: signup/login/verify endpoints are rate-limited to 10 attempts per 15 minutes. Wait it out.</li>
             <li><strong>"Email not verified" when creating a project</strong>: verify your email first (banner on the dashboard, or <code>dkit verify:send</code>).</li>
             <li><strong>"Invalid API key"</strong>: the <code>x-api-key</code> header does not match any project. Copy the key again from the dashboard.</li>
             <li><strong>Env var not found</strong>: remember non-production values live under <code>KEY__environment</code> when listing, and reads need <code>?environment=staging</code>.</li>
