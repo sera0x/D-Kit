@@ -25,9 +25,13 @@
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  background: var(--border-strong);
-  opacity: 0.55;
+  opacity: 0.9;
 }
+
+/* mac window traffic lights: close / minimize / zoom */
+.dshot-dot:nth-of-type(1) { background: #ff5f57; }
+.dshot-dot:nth-of-type(2) { background: #febc2e; }
+.dshot-dot:nth-of-type(3) { background: #28c840; }
 
 .dshot-url {
   margin-left: 0.6rem;

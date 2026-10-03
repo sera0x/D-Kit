@@ -86,17 +86,36 @@ html[data-chrome='light'] body {
   color-scheme: light;
 }
 
+/* Portaled elements (the navbar drawer renders via createPortal into
+   document.body) sit outside .dash-shell/.marketing-shell, so the shells'
+   light-token overrides never reach them. The chrome attribute lives on
+   <html>, an ancestor of everything, and is present exactly while a shell is
+   in light mode — so the same palette is restated here. Keep in sync with the
+   two shell blocks above. */
+html[data-chrome='light'] {
+  --bg: #ffffff;
+  --surface: #f7f8f7;
+  --surface-raised: #eef0ec;
+  --accent: #0a8447;
+  --accent-dim: #076d3a;
+  --accent-soft: rgba(10, 132, 71, 0.09);
+  --text: #101410;
+  --text-muted: #5c665e;
+  --border: rgba(11, 13, 12, 0.10);
+  --border-strong: rgba(11, 13, 12, 0.55);
+}
+
 input::placeholder, textarea::placeholder {
   color: var(--text-muted);
   opacity: 1;
 }
 
 /* The logo PNG is white-on-black with no alpha — invert it in light mode.
-   Auth pages (login, signup) never carry data-theme, so their logo is
-   always left untouched. */
+   The chrome attribute scopes the navbar rule so portaled drawer logos
+   (outside the marketing shell) are covered too. */
 .dash-shell[data-theme='light'] .dash-side-logo,
 .dash-shell[data-theme='light'] .dash-topbar-brand img,
-.marketing-shell[data-theme='light'] .navbar-logo {
+html[data-chrome='light'] .navbar-logo {
   filter: invert(1);
 }
 

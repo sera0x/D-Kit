@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Menu, X, LogOut, Sun, Moon, LayoutGrid, BookOpen, History } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/dkit-logo.png';
-import { applyChromeTheme, nudgeBrowserChrome } from '../../lib/browserChrome';
+import { applyChromeTheme, syncChrome, nudgeBrowserChrome } from '../../lib/browserChrome';
 import '../../pages/dashboard.css';
 import '../../pages/render-look.css';
 
@@ -34,6 +34,14 @@ export default function AppShell({ active, onNavigate, primaryNav, children }) {
   // status-bar color instead of flashing the dark marketing one.
   useLayoutEffect(() => { applyChromeTheme(theme); }, [theme]);
   useLayoutEffect(() => () => applyChromeTheme('dark'), []);
+
+  // Same mount-time realignment as MarketingShell: adopt the restored chrome,
+  // then nudge Safari to resample — its bars never re-read on meta/DOM edits.
+  useLayoutEffect(() => {
+    syncChrome();
+    const cancel = nudgeBrowserChrome({ keepPosition: true });
+    return cancel;
+  }, []);
 
   // Safari re-tints its bars at scroll/toolbar moments, not on DOM changes — nudge it after a
   // theme switch. (Route changes are already nudged in App.jsx, so skip the first run.)

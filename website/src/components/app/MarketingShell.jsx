@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
-import { applyChromeTheme, nudgeBrowserChrome } from '../../lib/browserChrome';
+import { applyChromeTheme, syncChrome, nudgeBrowserChrome } from '../../lib/browserChrome';
 
 // Same storage key as AppShell, so the preference carries between the
 // marketing pages and the dashboard/docs shell in both directions.
@@ -25,6 +25,18 @@ export default function MarketingShell({ children }) {
 
   useLayoutEffect(() => { applyChromeTheme(theme); }, [theme]);
   useLayoutEffect(() => () => applyChromeTheme('dark'), []);
+
+  // On mount, realign the browser chrome with whatever is actually on <html>:
+  // a hard refresh can restore a mid-session light chrome that React never
+  // applied, and a cross-tab navigation can land here with stale tint sources.
+  // Then nudge Safari to resample its bars (it re-tints at scroll moments,
+  // never on meta/DOM edits alone). Runs after the apply above, so the final
+  // pre-paint write is always this shell's own theme.
+  useLayoutEffect(() => {
+    syncChrome();
+    const cancel = nudgeBrowserChrome({ keepPosition: true });
+    return cancel;
+  }, []);
 
   const firstRun = useRef(true);
   useEffect(() => {

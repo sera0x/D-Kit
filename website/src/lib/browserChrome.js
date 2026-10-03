@@ -26,9 +26,35 @@ function replaceStrip(color) {
 }
 
 let resampleTimer = null;
+let stripColor = MARKETING_THEME_COLOR;
+
+// Re-apply the last chrome theme without computing anything. Called on shell
+// mount so a late-mounted React tree adopts chrome that React could not
+// observe (before first paint, or after a hard refresh restored a mid-session
+// light color on <html> that the unmount cleanup never saw).
+export function syncChrome() {
+  const root = document.documentElement;
+  if (root.getAttribute('data-chrome') === 'light') {
+    stripColor = SHELL_LIGHT_THEME_COLOR;
+    setThemeColor(SHELL_LIGHT_THEME_COLOR);
+    replaceStrip(SHELL_LIGHT_THEME_COLOR);
+    resampleAfterReplace();
+    return 'light';
+  }
+  setThemeColor(stripColor);
+  replaceStrip(stripColor);
+  resampleAfterReplace();
+  return 'dark';
+}
+
+function resampleAfterReplace() {
+  clearTimeout(resampleTimer);
+  resampleTimer = setTimeout(() => replaceStrip(stripColor), 150);
+}
 
 export function applyChromeTheme(theme) {
   const color = theme === 'light' ? SHELL_LIGHT_THEME_COLOR : MARKETING_THEME_COLOR;
+  stripColor = color;
   const root = document.documentElement;
   if (theme === 'light') root.setAttribute('data-chrome', 'light');
   else root.removeAttribute('data-chrome');
@@ -36,8 +62,7 @@ export function applyChromeTheme(theme) {
   document.body.style.backgroundColor = color;
   setThemeColor(color);
   replaceStrip(color);
-  clearTimeout(resampleTimer);
-  resampleTimer = setTimeout(() => replaceStrip(color), 150);
+  resampleAfterReplace();
 }
 
 export function nudgeBrowserChrome({ keepPosition = false } = {}) {
