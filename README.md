@@ -1,63 +1,85 @@
-<p align="center">
-  <img src="website/src/assets/dkit-logo.png" alt="D-Kit" width="76">
-</p>
+```console
+# dkit — secrets, cron, monitors and a log drain, self-hosted.
+# one CLI, one dashboard, one API.
 
-<h1 align="center">D-Kit</h1>
+$ curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh
 
-<p align="center"><strong>Secrets manager, scheduled jobs, uptime checks and a log drain for your projects. Self-hosted, on your own infrastructure. One CLI, one dashboard, one API.</strong></p>
+$ dkit login
+Email: you@work.dev
+✔ Verification code sent to your email
+Check your email (and spam folder) for the code.
+Enter verification code: 419202
+✔ Logged in successfully — sessions auto-renew, no weekly re-login
+Welcome back, you@work.dev
 
-<p align="center">
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-0c111d">
-  <img alt="Node" src="https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white">
-  <img alt="Express" src="https://img.shields.io/badge/express-4-000000?logo=express&logoColor=white">
-  <img alt="React" src="https://img.shields.io/badge/react-18-149ECA?logo=react&logoColor=white">
-  <img alt="Postgres" src="https://img.shields.io/badge/postgres-14%2B-4169E1?logo=postgresql&logoColor=white">
-  <img alt="Redis" src="https://img.shields.io/badge/redis-6%2B-DC382D?logo=redis&logoColor=white">
-</p>
-
----
-
-D-Kit is a toolkit for the boring parts of running side projects: env vars that change between environments, a key-value store your code reads at runtime, cron jobs and uptime monitors that don't need a server that stays awake, and a place for logs to go. Use the `dkit` command, the dashboard, or the plain HTTP API — all three talk to the same backend.
-
-## Install the CLI
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh
+$ dkit new api
+✔ Scaffolded api and linked it to project "api"
 ```
 
-The script verifies a SHA-256 checksum before installing and needs only curl, tar and node.
+D-Kit is for the parts of a side project nobody wants to build twice: where secrets live, what runs on a schedule, whether the site is up, where the logs went. One backend serves a CLI, a dashboard and a plain HTTP API, so you can script it, click it, or both.
 
-If Node is already part of your stack:
-
-```bash
-npm install -g dkit-cli
+```text
+   dkit CLI                dashboard
+      │  bearer token         │  session cookie
+      ▼                       ▼
+   ┌──────────────────────────────────────┐
+   │          one Express server          │
+   │   API + dashboard + job runner       │
+   └──────────────────────────────────────┘
+      │             │              │
+   Postgres       Redis         Resend
 ```
 
-There is no install script in the package, so `npm ci --ignore-scripts` and pnpm's default settings work fine.
+## What it replaces
 
-## What it does
+A `.env` file synced by hand, a cron box you ssh into to check on, an uptime service with a free tier you keep outgrowing, logs scattered across every machine you've deployed from, and the group chat where your teammate asks for the Stripe key.
 
-- **Keys are hashed at rest.** API keys and refresh tokens are stored as SHA-256 hashes and shown exactly once, at creation or rotation. Someone dumping your database gets prefixes, not keys.
-- **Environments are first-class.** development, staging, production, or your own names, as separate sets of secrets in one project. `env:diff` shows which keys differ, `env:copy` syncs them, and `env:rollback <key>` restores a previous value.
-- **No `.env` file on disk.** `dkit run -- npm start` injects secrets into the process that needs them and exits with that process's own status. `env:pull > .env` exists for when you do want the file.
-- **Secrets stay masked by default.** Listing variables never sends values over the wire — the server masks them, and revealing one is an explicit `env:get`. The audit feed records every write, delete and rollback with the actor and source IP.
-- **Cron jobs are human strings, not star fields.** `30s`, `5m`, `daily 09:30`, `mon 09:00`, all UTC, with a 10-second floor. The API fires the HTTP calls, keeps run history, and can pause or run a job on demand.
-- **Uptime monitors email once, not per check.** You get one message when a URL goes down and one when it recovers. Checks run from 30 seconds up to an hour apart.
-- **The log drain takes anything that can POST.** Ship single lines or JSON batches from any app, tail with level and search filters, and let the 7-day retention handle cleanup.
-- **A runtime key-value store** handles state that isn't a secret. JSON values, optional TTL, atomic increments. If your code writes it, it goes here; if you deploy it, it's a secret.
-- **Teams share projects without sharing accounts.** Owner, admin and member roles, projects shared into a team, invitations that only work for a verified address.
-- **Deletes make you type the command.** Projects and secrets confirm through a type-to-confirm prompt, like a terminal, because the destructive action is the point.
+## How it treats your secrets
 
-## Self-host it in one command
+Values are stored in Postgres, one project and environment at a time, and listings come back masked. The plaintext never travels until you ask for one value by name:
+
+```console
+$ dkit env:list
+
+  (masked — plaintext never left the API; use dkit env:get <key> to reveal one)
+```
+
+`dkit run -- npm start` goes one better: the command's process gets the secrets injected directly and exits with that process's own status. Nothing is written to disk. `env:pull > .env` exists for the times you actually want the file.
+
+Environments are first-class. `development`, `staging`, `production`, or your own names, all inside one project. `env:diff` shows which keys differ, `env:copy` syncs them, `env:rollback <key>` restores a previous value, and `env:history <key>` shows the audit feed with value lengths instead of values.
+
+## Cron you can read
+
+Schedules are human strings, not star fields: `30s`, `5m`, `2h`, `daily 09:30`, `mon 09:00`. All UTC, with a 10-second floor so a typo can't hammer anything.
+
+```console
+$ dkit cron:add nightly-export https://api.you.dev/export -s "daily 03:00"
+```
+
+The API fires the HTTP call, keeps the run history, and lets you pause, resume or trigger a job on demand from the CLI or dashboard. No server of yours stays awake to tick.
+
+## One email per incident
+
+`dkit monitor:add api https://api.you.dev/health` checks from every 30 seconds to every hour. When the URL goes down you get one email; when it comes back, one more. Not forty.
+
+## A drain for logs
+
+Anything that can POST can ship logs: single lines or JSON batches, from any app on any box. Tail them with level and search filters, and let the 7-day retention handle cleanup. The runtime store (`store:set/get/incr`) takes the state that isn't a secret: JSON values, optional TTL, atomic increments.
+
+## When it's not just you
+
+Teams get owner, admin and member roles, projects shared into a team, and invitations that only work for a verified address. Deletes stay deliberate: projects and secrets confirm through a type-to-confirm prompt, and rotating an API key kills the old one on the spot.
+
+## Run it on your own box
 
 ```bash
 git clone https://github.com/sera0x/D-Kit.git
 cd D-Kit
-cp backend/.env.example backend/.env     # fill in the three required values
+cp backend/.env.example backend/.env     # fill in the three values below
 ./scripts/start.sh
 ```
 
-That brings up the API serving the dashboard on `localhost:3001`. The database schema creates itself on first boot. You need Node 18+, PostgreSQL and Redis running, plus three values in `backend/.env`:
+That brings up the API serving the dashboard on `localhost:3001`. The database schema creates itself on first boot. You need Node 18+, PostgreSQL and Redis running, plus:
 
 | Variable | What it is |
 |---|---|
@@ -65,36 +87,9 @@ That brings up the API serving the dashboard on `localhost:3001`. The database s
 | `JWT_SECRET` | Signs session tokens — `openssl rand -hex 32` |
 | `RESEND_API_KEY` | Sends verification codes, invites and uptime alerts |
 
-OAuth is optional: the Google and GitHub buttons stay hidden until both ID and secret are set. A step-by-step VPS checklist is in [VPS-SETUP.md](VPS-SETUP.md), and [MIGRATION.md](MIGRATION.md) covers moving the whole stack to a new VPS with one archive.
+OAuth is optional: the Google and GitHub buttons stay hidden until both ID and secret are set. A step-by-step VPS checklist is in [VPS-SETUP.md](VPS-SETUP.md), and [MIGRATION.md](MIGRATION.md) moves the whole stack to a new VPS with one archive.
 
-## How it fits together
-
-```mermaid
-flowchart LR
-    CLI["dkit CLI"] -->|"bearer token"| API["Express API"]
-    Web["React dashboard"] -->|"session cookie"| API
-    API --> PG[("Postgres\nsecrets, jobs, monitors, logs")]
-    API --> Redis[("Redis\none-time codes")]
-    API --> Mail["Resend\nemail delivery"]
-    Runner["Job runner\nsame process"] --> PG
-    Runner -->|"fires due cron + monitors"| Hooks["your HTTP endpoints"]
-```
-
-The CLI and the dashboard are two clients of the same API, and neither one is a special case. The backend serves the built dashboard and the API on one port, and a job runner in the same process claims due cron jobs and probes monitors. Secrets live in Postgres per project and environment, and values only travel to clients that already passed the access check.
-
-## Repository layout
-
-| Path | What it is |
-|---|---|
-| `backend/` | The Express API, the job runner and the auth flow — the entire backend |
-| `website/` | The React dashboard and marketing site, built with Vite |
-| `cli/` | The `dkit` CLI, plus project templates for `dkit new` |
-| `scripts/` | Start, update, preview and VPS migration scripts |
-| `install.sh` | The `curl \| sh` installer for the CLI |
-| `VPS-SETUP.md` | Step-by-step VPS setup checklist |
-| `MIGRATION.md` | How to move everything to a new VPS with one archive |
-
-## The CLI
+## Every command, one screen
 
 | Command | What it does |
 |---|---|
@@ -120,9 +115,9 @@ The CLI and the dashboard are two clients of the same API, and neither one is a 
 
 Full reference lives at `/docs` on your deployment.
 
-## Security, briefly
+## Under the hood
 
-API keys and refresh tokens are stored as SHA-256 hashes, with the plaintext existing only in the response that issued them. Refresh tokens rotate on every use, so a stolen token dies the next time the real client refreshes. Env listings are masked server-side, env history keeps value lengths instead of values, and one-time codes and invitations are rate-limited.
+API keys and refresh tokens are stored as SHA-256 hashes, with the plaintext existing only in the response that issued them. Refresh tokens rotate on every use, so a stolen token dies the next time the real client refreshes. One-time codes and invitations are rate-limited.
 
 ## License
 
