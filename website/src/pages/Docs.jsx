@@ -55,7 +55,7 @@ const CLI_COMMANDS = [
   ['dkit monitor:list', 'List monitors and their live status.'],
   ['dkit monitor:pause <name>', 'Pause a monitor (--resume).'],
   ['dkit monitor:rm <name>', 'Delete a monitor.'],
-  ['dkit.name.ng/status', 'Live status of D-Kit\u2019s own services — API, Website, Docs. Auto-updates every 30s; incidents post here automatically.'],
+  ['dkit.name.ng/status', 'Live status of D-Kit\u2019s own services: API, Website, Docs. Auto-updates every 30s; incidents post here automatically.'],
   ['dkit logs:ship [msg]', 'Ship a log line (or piped JSON lines) to the drain. -l level, -s source, -m meta JSON.'],
   ['dkit logs:tail', 'Recent logs for the linked project. -l level, -q search, -n lines.'],
   ['dkit logs:clear', 'Delete all logs for the linked project.'],
@@ -92,10 +92,10 @@ export default function Docs({ onNavigate }) {
         <div className="docs-block">
           <h2>Quickstart</h2>
           <ol>
-            <li>Create an account — <a href="/signup" onClick={(e) => { e.preventDefault(); go('/signup'); }}>sign up</a>.</li>
+            <li>Create an account at <a href="/signup" onClick={(e) => { e.preventDefault(); go('/signup'); }}>sign up</a>.</li>
             <li>Verify your email with the 6-digit code we send you.</li>
             <li>Create a project on the dashboard and copy its <code>dk_...</code> API key.</li>
-            <li>Install the CLI — with npm, or the release script (no npm needed):</li>
+            <li>Install the CLI, with npm or the release script (no npm needed):</li>
           </ol>
           <CodeBlock>{`npm i -g dkit-cli
 # or, same CLI from the GitHub release (checksum verified):
@@ -113,13 +113,13 @@ dkit logs:ship "it's alive"`}</CodeBlock>
         <div className="docs-block">
           <h2>Concepts</h2>
           <ul>
-            <li><code>Project</code> — a container for one app. Each project gets its own API key.</li>
-            <li><code>Env vars</code> — secret key-value pairs per environment (default <code>production</code>, or e.g. <code>staging</code>). Hidden by default, read at runtime from your code.</li>
-            <li><code>Cron</code> — scheduled HTTP calls made by the API: ping endpoints, run rollups, trigger cleanups. No server that stays awake.</li>
-            <li><code>Monitors</code> — uptime checks on your URLs, with email alerts on down and recovery.</li>
-            <li><code>Logs</code> — a log drain your apps ship to over HTTP; tail it from the CLI or dashboard. 7-day retention.</li>
-            <li><code>Store</code> — a JSON key-value store for app data (counters, sessions, anything small).</li>
-            <li><code>API key</code> — the <code>dk_...</code> key that authenticates project calls from your code. The dashboard itself uses your login session; keys are hashed at rest and shown once.</li>
+            <li><code>Project</code>: a container for one app. Each project gets its own API key.</li>
+            <li><code>Env vars</code>: secret key-value pairs per environment (default <code>production</code>, or e.g. <code>staging</code>). Hidden by default, read at runtime from your code.</li>
+            <li><code>Cron</code>: scheduled HTTP calls made by the API: ping endpoints, run rollups, trigger cleanups. No server that stays awake.</li>
+            <li><code>Monitors</code>: uptime checks on your URLs, with email alerts on down and recovery.</li>
+            <li><code>Logs</code>: a log drain your apps ship to over HTTP; tail it from the CLI or dashboard. 7-day retention.</li>
+            <li><code>Store</code>: a JSON key-value store for app data (counters, sessions, anything small).</li>
+            <li><code>API key</code>: the <code>dk_...</code> key that authenticates project calls from your code. The dashboard itself uses your login session; keys are hashed at rest and shown once.</li>
           </ul>
         </div>
 
@@ -291,14 +291,14 @@ requests.post(
         <div className="docs-block">
           <h2>Troubleshooting</h2>
           <ul>
-            <li><strong>"Could not send the ... email"</strong> — sending is handled by Resend from dkit.name.ng. Check spam, wait a minute and try again. If it persists, the domain verification may still be propagating.</li>
-            <li><strong>Cron job never fires</strong> — schedules are UTC strings like <code>5m</code>, <code>daily 09:30</code>. Check <code>dkit cron:runs &lt;name&gt;</code> for the recorded error; jobs whose URL is unreachable show <code>error: …</code>.</li>
-            <li><strong>Monitor says down but the site works</strong> — two consecutive failures mark a monitor down. Check the recorded status code; a 4xx/5xx counts as down.</li>
-            <li><strong>Logs missing</strong> — retention is 7 days, and ingest needs the <code>x-api-key</code> header. <code>dkit logs:ship "test"</code> then <code>dkit logs:tail</code> verifies the pipe end-to-end.</li>
-            <li><strong>"Too many attempts. Please try again in a few minutes."</strong> — signup/login/verify endpoints are rate-limited to 10 attempts per 15 minutes. Wait it out.</li>
-            <li><strong>"Email not verified" when creating a project</strong> — verify your email first (banner on the dashboard, or <code>dkit verify:send</code>).</li>
-            <li><strong>"Invalid API key"</strong> — the <code>x-api-key</code> header does not match any project. Copy the key again from the dashboard.</li>
-            <li><strong>Env var not found</strong> — remember non-production values live under <code>KEY__environment</code> when listing, and reads need <code>?environment=staging</code>.</li>
+            <li><strong>"Could not send the ... email"</strong>: sending is handled by Resend from dkit.name.ng. Check spam, wait a minute and try again. If it persists, the domain verification may still be propagating.</li>
+            <li><strong>Cron job never fires</strong>: schedules are UTC strings like <code>5m</code>, <code>daily 09:30</code>. Check <code>dkit cron:runs &lt;name&gt;</code> for the recorded error; jobs whose URL is unreachable show <code>error: …</code>.</li>
+            <li><strong>Monitor says down but the site works</strong>: two consecutive failures mark a monitor down. Check the recorded status code; a 4xx/5xx counts as down.</li>
+            <li><strong>Logs missing</strong>: retention is 7 days, and ingest needs the <code>x-api-key</code> header. <code>dkit logs:ship "test"</code> then <code>dkit logs:tail</code> verifies the pipe end-to-end.</li>
+            <li><strong>"Too many attempts. Please try again in a few minutes."</strong>: signup/login/verify endpoints are rate-limited to 10 attempts per 15 minutes. Wait it out.</li>
+            <li><strong>"Email not verified" when creating a project</strong>: verify your email first (banner on the dashboard, or <code>dkit verify:send</code>).</li>
+            <li><strong>"Invalid API key"</strong>: the <code>x-api-key</code> header does not match any project. Copy the key again from the dashboard.</li>
+            <li><strong>Env var not found</strong>: remember non-production values live under <code>KEY__environment</code> when listing, and reads need <code>?environment=staging</code>.</li>
           </ul>
         </div>
 

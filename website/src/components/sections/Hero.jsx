@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Orb from '../ui/Orb';
 import logo from '../../assets/dkit-logo.png';
-import { Terminal } from '../ui/Terminal';
+import DashboardShot from '../ui/DashboardShot';
 import Shuffle from '../ui/Shuffle';
 import { useAuth } from '../../context/AuthContext';
 import { MarketingThemeContext } from '../app/MarketingShell';
@@ -15,7 +15,7 @@ const copy = () => { navigator.clipboard?.writeText(INSTALL_CMD); setCopied(true
 const getStarted = () => { const target = user ? '/dashboard' : '/signup'; onNavigate ? onNavigate(target) : (window.location.href = target); };
 return (
 <section className="hero-section" id="top">
-<button className="navbar-brand hero-brand-btn" onClick={() => (onNavigate ? onNavigate("/") : (window.location.href = "/"))}><img src={logo} alt="" className="navbar-logo" /><span>D-Kit</span></button>
+<button className="navbar-brand hero-brand-btn" onClick={() => (onNavigate ? onNavigate("/") : (window.location.href = "/"))}><img src={logo} alt="D-Kit logo" className="navbar-logo" /><span>D-Kit</span></button>
 <button className="cta-button ghost hero-account-btn" onClick={() => { const t = user ? "/dashboard" : "/login"; onNavigate ? onNavigate(t) : (window.location.href = t); }}>{user ? "dashboard" : "dkit login"}</button>
 <div className="hero-glow">
   <Orb hue={151} hoverIntensity={0.5} rotateOnHover={true}
@@ -32,7 +32,7 @@ return (
 </div>
 </div>
 <div className="hero-terminal-wrap">
-<Terminal commands={['dkit new payments-api --template express-pg','dkit env:set DATABASE_URL postgres://...','dkit run -- npm start']} outputs={{0:['✓ Created D-Kit project "payments-api"','✓ Scaffolded 14 files from express-pg'],1:['✓ DATABASE_URL set for production'],2:['✓ secrets injected, nothing written to disk','server running on :3000']}} typingSpeed={35} delayBetweenCommands={700} />
+<DashboardShot />
 </div>
 </div>
 </section>

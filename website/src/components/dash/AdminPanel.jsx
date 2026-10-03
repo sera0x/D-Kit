@@ -205,7 +205,7 @@ export default function AdminPanel() {
               </div>
             )}
             {mailResult && !mailResult.error && (
-              <p className="team-hint">Sent to {mailResult.sent} of {mailResult.total}{mailResult.failed.length > 0 ? ' — failed: ' + mailResult.failed.join(', ') : ''}.</p>
+              <p className="team-hint">Sent to {mailResult.sent} of {mailResult.total}{mailResult.failed.length > 0 ? ' (failed: ' + mailResult.failed.join(', ') + ')' : ''}.</p>
             )}
             {mailResult?.error && <p className="auth-error">{mailResult.error}</p>}
           </div>

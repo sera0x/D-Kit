@@ -3,22 +3,46 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>D-Kit: secrets, cron and monitors, self-hosted</title>
+    <meta name="description" content="Self-hosted secrets manager with a CLI, dashboard and API. Run commands with env vars injected, schedule HTTP calls, watch URLs, and ship logs. Free while in beta." />
+    <link rel="canonical" href="https://dkit.name.ng/" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050606" />
     <meta name="color-scheme" content="dark light" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>D-Kit</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="D-Kit" />
+    <meta property="og:title" content="D-Kit: secrets, cron and monitors, self-hosted" />
+    <meta property="og:description" content="Self-hosted secrets manager with a CLI, dashboard and API. Run commands with env vars injected, schedule HTTP calls, watch URLs, and ship logs." />
+    <meta property="og:url" content="https://dkit.name.ng/" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>html { background-color: #050606; }</style>
-    <script>
-      window.addEventListener('error', function(e) {
-        document.body.innerHTML = '<pre style="color:#fff;padding:2rem;white-space:pre-wrap;font-family:monospace;font-size:14px;">JS ERROR:\n' + (e.error && e.error.stack ? e.error.stack : e.message) + '</pre>';
-      });
-      window.addEventListener('unhandledrejection', function(e) {
-        document.body.innerHTML = '<pre style="color:#fff;padding:2rem;white-space:pre-wrap;font-family:monospace;font-size:14px;">UNHANDLED PROMISE REJECTION:\n' + (e.reason && e.reason.stack ? e.reason.stack : e.message) + '</pre>';
-      });
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "D-Kit",
+          "applicationCategory": "DeveloperApplication",
+          "operatingSystem": "Self-hosted",
+          "url": "https://dkit.name.ng",
+          "description": "Self-hosted secrets manager with a CLI, dashboard and API. Env vars injected at runtime, human-readable cron, uptime monitors and a log drain.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@type": "Person", "name": "sera0x" }
+        },
+        {
+          "@type": "WebSite",
+          "name": "D-Kit",
+          "url": "https://dkit.name.ng"
+        }
+      ]
+    }
     </script>
 </head>
 <body>

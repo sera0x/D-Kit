@@ -1,0 +1,125 @@
+/* Hero dashboard mock: static, token-driven, deliberately quiet. No shadows
+   with baked-in darkness, no glow, no gradients; contrast comes from borders
+   and surfaces so it reads in both themes. Mirrors the dashboard's geometry:
+   sidebar, section header, then bordered cards. */
+.dshot {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.dshot-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.dshot-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--border-strong);
+  opacity: 0.55;
+}
+
+.dshot-url {
+  margin-left: 0.6rem;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.dshot-body {
+  display: grid;
+  grid-template-columns: 6.2rem 1fr;
+  min-height: 13.5rem;
+}
+
+.dshot-side {
+  border-right: 1px solid var(--border);
+  padding: 0.7rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.dshot-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.dshot-logo { width: auto; height: 15px; }
+.marketing-shell[data-theme='light'] .dshot-logo { filter: invert(1); }
+
+.dshot-nav {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.dshot-nav.on {
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.dshot-main { padding: 0.8rem 0.9rem; display: grid; gap: 0.7rem; align-content: start; }
+
+.dshot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dshot-h { font-weight: 700; font-size: 0.82rem; }
+.dshot-key { color: var(--text-muted); font-size: 0.7rem; }
+
+.dshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.dshot-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.6rem;
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+}
+
+.dshot-grid .dshot-card:first-child { grid-column: 1 / -1; }
+
+.dshot-label {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  margin-bottom: 0.1rem;
+}
+
+.dshot-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.dshot-row code { color: var(--text); font-size: 0.7rem; }
+.dshot-row span { color: var(--text-muted); font-size: 0.7rem; }
+.dshot-row .dshot-ok { color: var(--accent); }
+
+@media (max-width: 60rem) {
+  .dshot-body { min-height: 0; }
+  .dshot-grid { grid-template-columns: 1fr; }
+}

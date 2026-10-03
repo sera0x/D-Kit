@@ -426,11 +426,11 @@ export default function Dashboard({ onNavigate }) {
         <span className="project-avatar" aria-hidden="true">{p.name.slice(0, 1).toUpperCase()}</span>
         <span className="project-name">{p.name}</span>
         {p.is_shared && (
-          <span className="shared-chip" title={'Shared by ' + (p.owner_email || 'a teammate') + (p.team_names ? ' — via ' + p.team_names : '')}>
+          <span className="shared-chip" title={'Shared by ' + (p.owner_email || 'a teammate') + (p.team_names ? ' (via ' + p.team_names + ')' : '')}>
             shared
           </span>
         )}
-        <code className="project-key" title={p.key_prefix ? (saved ? 'Saved in this browser\'s key vault' : 'Key not saved in this browser — tap the eye to add it') : 'No API key yet — dashboard access works without one; create a key for CLI/API use'}>
+        <code className="project-key" title={p.key_prefix ? (saved ? 'Saved in this browser\'s key vault' : 'Key not saved in this browser: tap the eye to add it') : 'No API key yet. Dashboard access works without one; create a key for CLI/API use'}>
           {p.key_prefix ? (revealed ? saved : p.key_prefix + '…') : 'no api key'}
         </code>
         <span className="secrets-acts">
@@ -445,12 +445,12 @@ export default function Dashboard({ onNavigate }) {
             </button>
           )}
           {!!p.key_prefix && (
-            <button className="icon-btn" aria-label="Copy API key" title={saved ? 'Copy key' : 'Key not saved in this browser — click the eye to paste it once'} onClick={() => copyProjectKey(p)}>
+            <button className="icon-btn" aria-label="Copy API key" title={saved ? 'Copy key' : 'Key not saved in this browser: click the eye to paste it once'} onClick={() => copyProjectKey(p)}>
               {copiedTag === 'api:' + p.id ? <Check width="14" height="14" /> : copyHint === p.id ? <Info width="14" height="14" /> : <Copy width="14" height="14" />}
             </button>
           )}
           {!p.is_shared && !!p.key_prefix && (
-            <button className="icon-btn icon-btn-danger" aria-label="Revoke API key" title="Revoke key — CLI/API access is cut off until a new key is created" onClick={() => revokeApiKey(p)}>
+            <button className="icon-btn icon-btn-danger" aria-label="Revoke API key" title="Revoke key: CLI/API access is cut off until a new key is created" onClick={() => revokeApiKey(p)}>
               <RotateCcw width="14" height="14" />
             </button>
           )}
@@ -472,8 +472,8 @@ export default function Dashboard({ onNavigate }) {
           <div className="paste-key-row">
             <p className="paste-key-hint">
               {p.is_shared
-                ? 'Keys are stored hashed — D-Kit can never show one, not even to the owner. Paste the key shared with you once; it stays in this browser only.'
-                : 'Keys are stored hashed — D-Kit can never show one, not even yours. Paste the key from when you created it, or rotate to get a new one.'}
+                ? 'Keys are stored hashed, so D-Kit can never show one, not even to the owner. Paste the key shared with you once; it stays in this browser only.'
+                : 'Keys are stored hashed, so D-Kit can never show one, not even yours. Paste the key from when you created it, or rotate to get a new one.'}
             </p>
             <input
               type="text"
@@ -674,7 +674,7 @@ export default function Dashboard({ onNavigate }) {
       {statusPing && (
         <button className="status-alert-banner" role="alert" onClick={() => { setSection('admin'); setStatusPing(null); }}>
           <strong>{statusPing.unseen_count} service issue{statusPing.unseen_count === 1 ? '' : 's'} detected</strong>
-          <span>— open the admin tab to review, or view the public status page.</span>
+          <span>open the admin tab to review, or view the public status page.</span>
         </button>
       )}
       {rotatedKey && (
@@ -823,7 +823,7 @@ export default function Dashboard({ onNavigate }) {
                   </div>
                 ) : (
                   <>
-                    <p className="page-header-sub" style={{ marginBottom: '1rem' }}>Pick a project — or select it once in the sidebar and it follows you everywhere.</p>
+                    <p className="page-header-sub" style={{ marginBottom: '1rem' }}>Pick a project, or select it once in the sidebar and it follows you everywhere.</p>
                     <div className="project-picker">
                       {projects.map((p) => (
                         <button key={p.id} className="project-pick" onClick={() => pickProject(p)}>
@@ -1062,7 +1062,7 @@ export default function Dashboard({ onNavigate }) {
                   )}
                   <div className="kv-add-row store-add">
                     <input type="text" placeholder="key (e.g. user:123)" value={newStoreKey} onChange={(e) => setNewStoreKey(e.target.value)} />
-                    <textarea placeholder={'value — JSON or plain text\n{"name":"Jane"} '} value={newStoreValue} onChange={(e) => setNewStoreValue(e.target.value)} />
+                    <textarea placeholder={'value: JSON or plain text\n{"name":"Jane"} '} value={newStoreValue} onChange={(e) => setNewStoreValue(e.target.value)} />
                     <div style={{ display: 'grid', gap: '0.6rem' }}>
                       <input className="ttl-input" type="number" min="1" placeholder="TTL sec" value={newStoreTtl} onChange={(e) => setNewStoreTtl(e.target.value)} />
                       <button className="cta-button ghost" disabled={savingStore} onClick={() => addStoreItem(selected)}>
@@ -1174,7 +1174,7 @@ export default function Dashboard({ onNavigate }) {
                 projects.length === 0 ? (
                   <div className="empty-state">
                     <Activity width="22" height="22" />
-                    <p>Watch a URL — one email when it goes down, one when it recovers.</p>
+                    <p>Watch a URL: one email when it goes down, one when it recovers.</p>
                     <button className="cta-button ghost" onClick={() => setSection('projects')}>Create a project</button>
                   </div>
                 ) : (

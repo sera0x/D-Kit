@@ -22,6 +22,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { api } from './lib/api';
 import { getPendingInvite } from './lib/pendingInvite';
 import { nudgeBrowserChrome } from './lib/browserChrome';
+import { applySeoMeta } from './lib/seo';
 function OAuthCallback({ onNavigate }) {
 const { login } = useAuth();
 useEffect(() => {
@@ -70,6 +71,7 @@ navigate('/accept-invite');
 }
 }, [currentPath, token]);
 useEffect(() => nudgeBrowserChrome(), [currentPath]);
+useEffect(() => applySeoMeta(currentPath), [currentPath]);
 const isKnownPath = KNOWN_PATHS.includes(currentPath);
 const isAppShellPage = APP_SHELL_PATHS.includes(currentPath) || !isKnownPath;
 // The homepage has no navbar: its CTAs and footer cover navigation, and it keeps the top of the page clean

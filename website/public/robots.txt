@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /accept-invite
+Disallow: /oauth/callback
+
+Sitemap: https://dkit.name.ng/sitemap.xml

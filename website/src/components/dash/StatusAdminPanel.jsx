@@ -71,7 +71,7 @@ export default function StatusAdminPanel({ token }) {
             <div key={n.id} className={'status-admin-notif' + (n.seen_by_admin_at ? '' : ' unseen')}>
               <span className={'status-pill ' + (n.resolved_at ? 'ok' : 'err')} />
               <div className="status-admin-notif-body">
-                <p><strong>{n.service_name || 'Platform'}</strong> — {n.title}</p>
+                <p><strong>{n.service_name || 'Platform'}</strong>: {n.title}</p>
                 <span>{fmt(n.created_at)} · {n.resolved_at ? 'auto-resolved ' + fmt(n.resolved_at) : 'still open'}</span>
                 {(n.updates || [])[0] && <em>{n.updates[0].message}</em>}
               </div>
@@ -189,7 +189,7 @@ export default function StatusAdminPanel({ token }) {
                   <span className="status-chip ghost">{inc.source}{inc.source === 'auto' ? ' (prober)' : ''}</span>
                 </div>
                 {(inc.updates || []).slice(-2).map((u) => (
-                  <p key={u.id} className="status-admin-update"><em>{u.state}</em> — {u.message} <time>{fmt(u.created_at)}</time></p>
+                  <p key={u.id} className="status-admin-update"><em>{u.state}</em> {u.message} <time>{fmt(u.created_at)}</time></p>
                 ))}
                 <div className="status-admin-form status-admin-form-row">
                   <select value={draft.state} onChange={(e) => setDraft(inc.id, { state: e.target.value })} aria-label="Update state">
