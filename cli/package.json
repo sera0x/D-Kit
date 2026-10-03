@@ -17,10 +17,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/excelottah6/D-Kit.git"
+    "url": "git+https://github.com/sera0x/D-Kit.git"
   },
-  "homepage": "https://github.com/excelottah6/D-Kit#readme",
-  "bugs": "https://github.com/excelottah6/D-Kit/issues",
+  "homepage": "https://github.com/sera0x/D-Kit#readme",
+  "bugs": "https://github.com/sera0x/D-Kit/issues",
   "keywords": [
     "dkit",
     "cli",

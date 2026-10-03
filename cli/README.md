@@ -1,7 +1,7 @@
 # dkit-cli
 
-Command-line interface for [D-Kit](https://github.com/excelottah6/D-Kit) —
-secrets, scaffolding, cron jobs, uptime monitors, and log shipping from one
+Command-line interface for [D-Kit](https://github.com/sera0x/D-Kit). Secrets,
+scaffolding, cron jobs, uptime monitors, and log shipping from one
 `dkit` command.
 
 ## Install
@@ -10,14 +10,14 @@ secrets, scaffolding, cron jobs, uptime monitors, and log shipping from one
 npm install -g dkit-cli
 ```
 
-No install script in this package — everything is plain JavaScript, so
+No install script in this package: everything is plain JavaScript, so
 `npm ci --ignore-scripts` and pnpm's default settings work fine.
 
 Prefer not to use npm? The same CLI ships as a tarball with every GitHub
 release, with an installer that verifies the checksum first:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/excelottah6/D-Kit/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh
 ```
 
 ## Quickstart

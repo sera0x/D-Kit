@@ -7,7 +7,7 @@ D-Kit is a toolkit for the boring parts of running side projects: env vars that 
 ## Install the CLI
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/excelottah6/D-Kit/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh
 ```
 
 The script verifies a SHA-256 checksum before installing and needs only curl, tar and node.
@@ -45,7 +45,7 @@ Deletes make you type the command. Projects and secrets confirm through a type-t
 ## Self-host it
 
 ```bash
-git clone https://github.com/excelottah6/D-Kit.git
+git clone https://github.com/sera0x/D-Kit.git
 cd D-Kit
 cp backend/.env.example backend/.env     # fill in the three required values
 ./scripts/start.sh

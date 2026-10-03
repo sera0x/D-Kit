@@ -99,7 +99,7 @@ export default function Docs({ onNavigate }) {
           </ol>
           <CodeBlock>{`npm i -g dkit-cli
 # or, same CLI from the GitHub release (checksum verified):
-curl -fsSL https://raw.githubusercontent.com/excelottah6/D-Kit/main/install.sh | sh`}</CodeBlock>
+curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh`}</CodeBlock>
           <ol start={5}>
             <li>Log in and start setting secrets:</li>
           </ol>
