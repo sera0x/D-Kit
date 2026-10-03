@@ -14,6 +14,7 @@ import Docs from './pages/Docs';
 import Status from './pages/Status';
 import NotFound from './pages/NotFound';
 import Changelog from './pages/Changelog';
+import Tools from './pages/Tools';
 import AcceptInvite from './pages/AcceptInvite';
 import MarketingShell from './components/app/MarketingShell';
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -43,7 +44,7 @@ finish();
 }, []);
 return null;
 }
-const APP_SHELL_PATHS = ['/dashboard', '/docs', '/changelog', '/status', '/suspended', '/accept-invite'];
+const APP_SHELL_PATHS = ['/dashboard', '/docs', '/changelog', '/status', '/tools', '/suspended', '/accept-invite'];
 // Paths with their own screens. Anything else gets the 404 page (which brings
 // its own app shell), instead of silently rendering the homepage.
 const KNOWN_PATHS = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/oauth/callback', ...APP_SHELL_PATHS];
@@ -87,6 +88,7 @@ case '/oauth/callback': return <OAuthCallback onNavigate={navigate} />;
 case '/docs': return <Docs onNavigate={navigate} />;
 case '/status': return <Status onNavigate={navigate} />;
 case '/changelog': return <Changelog onNavigate={navigate} />;
+case '/tools': return <Tools onNavigate={navigate} />;
 case '/accept-invite': return <AcceptInvite onNavigate={navigate} />;
 case '/suspended': return <SuspendedNotice onNavigate={navigate} />;
 case '/dashboard': if (!token) return null; return <Dashboard onNavigate={navigate} />;

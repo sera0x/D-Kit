@@ -7,7 +7,7 @@ return (
 <footer className="footer">
 <div className="footer-inner">
 <div className="footer-brand"><img src={logo} alt="D-Kit" className="navbar-logo" /><span>D-Kit</span></div>
-<div className="footer-links"><a href="#features">Product</a><a href="#demo">CLI</a><a href="#pricing">Pricing</a><a href="/docs" onClick={go('/docs')}>Docs</a><a href="/changelog" onClick={go('/changelog')}>Changelog</a><a href="/status" onClick={go('/status')}>Status</a><a href="https://github.com/sera0x/D-Kit" rel="noopener">GitHub</a><a href="/llms.txt" rel="noopener">llms.txt</a></div>
+<div className="footer-links"><a href="#features">Product</a><a href="#demo">CLI</a><a href="#pricing">Pricing</a><a href="/docs" onClick={go('/docs')}>Docs</a><a href="/changelog" onClick={go('/changelog')}>Changelog</a><a href="/tools" onClick={go('/tools')}>Tools</a><a href="/status" onClick={go('/status')}>Status</a><a href="https://github.com/sera0x/D-Kit" rel="noopener">GitHub</a><a href="/llms.txt" rel="noopener">llms.txt</a></div>
 <p className="footer-copy">&copy; {new Date().getFullYear()} D-Kit</p>
 </div>
 </footer>

@@ -2,8 +2,6 @@
 
 Secrets manager, scheduled jobs, uptime checks and a log drain for your projects. Self-hosted, on your own infrastructure. One CLI, one dashboard, one API.
 
-A hosted instance runs at [dkit.name.ng](https://dkit.name.ng).
-
 D-Kit is a toolkit for the boring parts of running side projects: env vars that change between environments, a key-value store your code reads at runtime, cron jobs and uptime monitors that don't need a server that stays awake, and a place for logs to go. Use the `dkit` command, the dashboard, or the plain HTTP API — all three talk to the same backend.
 
 ## Install the CLI

@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Menu, X, LogOut, Sun, Moon, LayoutGrid, BookOpen, History } from 'lucide-react';
+import { Menu, X, LogOut, Sun, Moon, LayoutGrid, BookOpen, Wrench } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/dkit-logo.png';
 import { applyChromeTheme, syncChrome, nudgeBrowserChrome } from '../../lib/browserChrome';
@@ -22,6 +22,9 @@ import '../../pages/render-look.css';
 export default function AppShell({ active, onNavigate, primaryNav, children }) {
   const { user, logout } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerClosing, setDrawerClosing] = useState(false);
+  const [drawerKey, setDrawerKey] = useState(0);
+  const drawerTimer = useRef(null);
   const [theme, setTheme] = useState(() => {
     try { return localStorage.getItem('dkit_theme') || 'dark'; } catch { return 'dark'; }
   });
@@ -52,7 +55,31 @@ export default function AppShell({ active, onNavigate, primaryNav, children }) {
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
-  const goto = (path) => { setDrawerOpen(false); onNavigate ? onNavigate(path) : (window.location.href = path); };
+
+  // Mobile drawer close = animate out first (150ms), unmount after. Reopening
+  // mid-close cancels the timer and remounts (new key) so the open animation
+  // plays again.
+  const closeDrawer = () => {
+    if (drawerTimer.current) return;
+    setDrawerClosing(true);
+    drawerTimer.current = setTimeout(() => {
+      drawerTimer.current = null;
+      setDrawerClosing(false);
+      setDrawerOpen(false);
+    }, 170);
+  };
+
+  const openDrawer = () => {
+    clearTimeout(drawerTimer.current);
+    drawerTimer.current = null;
+    setDrawerClosing(false);
+    setDrawerKey((k) => k + 1);
+    setDrawerOpen(true);
+  };
+
+  useEffect(() => () => clearTimeout(drawerTimer.current), []);
+
+  const goto = (path) => { closeDrawer(); onNavigate ? onNavigate(path) : (window.location.href = path); };
   const goHome = () => goto('/');
   const handleLogout = () => { logout(); goto('/'); };
 
@@ -66,15 +93,15 @@ export default function AppShell({ active, onNavigate, primaryNav, children }) {
       <button className={'dash-nav-item' + (active === 'docs' ? ' active' : '')} onClick={() => goto('/docs')}>
         <BookOpen width="16" height="16" /> Docs
       </button>
-      <button className={'dash-nav-item' + (active === 'changelog' ? ' active' : '')} onClick={() => goto('/changelog')}>
-        <History width="16" height="16" /> Changelog
+      <button className={'dash-nav-item' + (active === 'tools' ? ' active' : '')} onClick={() => goto('/tools')}>
+        <Wrench width="16" height="16" /> Tools
       </button>
     </>
   );
 
   const nav = (
     // Clicking any nav item — workspace or quick link — closes the mobile drawer.
-    <nav className="dash-nav" onClick={() => setDrawerOpen(false)}>
+    <nav className="dash-nav" onClick={() => closeDrawer()}>
       {primaryNav && (
         <>
           <span className="dash-side-chip">Workspace</span>
@@ -133,18 +160,18 @@ export default function AppShell({ active, onNavigate, primaryNav, children }) {
           {theme === 'dark' ? <Sun width="16" height="16" /> : <Moon width="16" height="16" />}
         </button>
         {!user && <button className="cta-button ghost" onClick={() => goto('/login')}>log in</button>}
-        <button className="icon-btn" aria-label="Open menu" onClick={() => setDrawerOpen(true)}><Menu width="16" height="16" /></button>
+        <button className="icon-btn" aria-label="Open menu" onClick={openDrawer}><Menu width="16" height="16" /></button>
       </div>
     </div>
   );
 
-  const drawer = drawerOpen && (
+  const drawer = (drawerOpen || drawerClosing) && (
     <>
-      <div className="dash-backdrop" onClick={() => setDrawerOpen(false)} aria-hidden="true" />
-      <div className="dash-drawer" role="dialog" aria-label="Menu">
+      <div className={'dash-backdrop' + (drawerClosing ? ' is-closing' : '')} onClick={closeDrawer} aria-hidden="true" />
+      <div key={drawerKey} className={'dash-drawer' + (drawerClosing ? ' is-closing' : '')} role="dialog" aria-label="Menu">
         <div className="dash-drawer-header">
           <button className="dash-side-header" onClick={goHome}><img src={logo} alt="" className="dash-side-logo" /><span>D-Kit</span></button>
-          <button className="dash-drawer-close" aria-label="Close menu" onClick={() => setDrawerOpen(false)}><X width="16" height="16" /></button>
+          <button className="dash-drawer-close" aria-label="Close menu" onClick={closeDrawer}><X width="16" height="16" /></button>
         </div>
         {nav}
         {accountSlot}

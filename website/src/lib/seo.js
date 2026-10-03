@@ -21,6 +21,10 @@ const PAGES = {
     title: 'D-Kit status',
     description: 'Live uptime for the D-Kit API, website and docs, updated every 30 seconds.',
   },
+  '/tools': {
+    title: 'D-Kit tools: browser dev utilities',
+    description: 'Secret and UUID generators, JWT decoder, SHA-256 hashes, epoch converter, base64, URL encoding and a cron string builder. Everything runs in your browser.',
+  },
   '/login': {
     title: 'Log in to D-Kit',
     description: 'Log in with your email and a one-time code.',

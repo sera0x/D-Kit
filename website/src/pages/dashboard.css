@@ -1445,6 +1445,28 @@
   }
 }
 
+/* Close mirrors the enter, but at quick speed instead of fast
+   (open/close asymmetry). */
+.dash-drawer.is-closing {
+  animation: dkDrawerOut var(--duration-quick) var(--ease-smooth-out) forwards;
+}
+
+.dash-backdrop.is-closing {
+  animation: fadeOut var(--duration-quick) var(--ease-out) forwards;
+}
+
+@keyframes dkDrawerOut {
+  to {
+    transform: translateX(calc(-1 * var(--distance-base)));
+    opacity: 0;
+    filter: blur(var(--blur-small));
+  }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
 /* Section drill-in: content slides in from the right with a soft blur
    (transitions.dev page-slide, enter-only, tokenized) */
 .dash-section {

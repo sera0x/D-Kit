@@ -784,6 +784,24 @@
   to { opacity: 1; }
 }
 
+/* Close is quicker than open (open/close asymmetry): the drawer exits the way
+   it came in, but at quick speed instead of fast. */
+.navbar-drawer.is-closing {
+  animation: navbarSlideOut var(--duration-quick) var(--ease-smooth-out) forwards;
+}
+
+.navbar-backdrop.is-closing {
+  animation: navbarFadeOut var(--duration-quick) var(--ease-out) forwards;
+}
+
+@keyframes navbarSlideOut {
+  to { transform: translateX(-100%); }
+}
+
+@keyframes navbarFadeOut {
+  to { opacity: 0; }
+}
+
 /* Login / dashboard button floating top-right of the hero, no bar behind it */
 .hero-section {
   min-height: 100vh;
