@@ -6,13 +6,15 @@ import CodeSlots from '../components/ui/CodeSlots';
 import './auth.css';
 
 export default function Login({ onNavigate }) {
-  const [step, setStep] = useState('credentials'); // 'credentials' | 'code'
+  const [step, setStep] = useState('credentials'); // 'credentials' | 'code' | 'twofa'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [codeStatus, setCodeStatus] = useState('idle');
   const submittingRef = useRef(false);
   const [loginToken, setLoginToken] = useState('');
+  const [twoFaCode, setTwoFaCode] = useState('');
+  const [recoveryMode, setRecoveryMode] = useState(false);
   const [error, setError] = useState(() => {
     const e = new URLSearchParams(window.location.search).get('error');
     if (e === 'rate') return 'Too many attempts. Please wait a few minutes and try again.';
@@ -26,6 +28,15 @@ export default function Login({ onNavigate }) {
 
   useEffect(() => {
     api.oauthProviders().then(setProviders).catch(() => {});
+    // OAuth logins for 2FA accounts bounce back here with a pending challenge:
+    // the provider already proved who they are, the authenticator code is the
+    // remaining step.
+    const challenge = new URLSearchParams(window.location.search).get('challenge');
+    if (challenge) {
+      setLoginToken(challenge);
+      setStep('twofa');
+      window.history.replaceState({}, '', '/login');
+    }
   }, []);
 
   const goTo = (path) => {
@@ -66,6 +77,28 @@ export default function Login({ onNavigate }) {
       if (err.status === 403) { goTo('/suspended'); return; }
       setError(err.message || 'Invalid or expired code');
       setCodeStatus('error'); // CodeSlots drains the digits and clears itself
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Second factor for 2FA accounts: an authenticator code, or a recovery code
+  // typed into the same field (the server accepts either against the same
+  // challenge).
+  const submitTwoFa = async (value) => {
+    const v = String(value || '').trim();
+    if (submittingRef.current || !v) return;
+    submittingRef.current = true;
+    setError('');
+    setSubmitting(true);
+    try {
+      const data = await api.loginVerify(loginToken, v);
+      login(data.user, data.token, data.refresh_token);
+      goTo('/dashboard');
+    } catch (err) {
+      submittingRef.current = false;
+      if (err.status === 403) { goTo('/suspended'); return; }
+      setError(err.message || 'Invalid or expired code');
     } finally {
       setSubmitting(false);
     }
@@ -128,6 +161,44 @@ export default function Login({ onNavigate }) {
               </>
             )}
           </form>
+        )}
+
+        {step === 'twofa' && (
+          <div>
+            <p className="auth-hint">Enter the 6-digit code from your authenticator app{email ? ` for ${email}` : ''}.</p>
+            <form onSubmit={(e) => { e.preventDefault(); submitTwoFa(twoFaCode); }}>
+              <label>
+                {recoveryMode ? 'Recovery code' : 'Authenticator code'}
+                <input
+                  type="text"
+                  inputMode={recoveryMode ? 'text' : 'numeric'}
+                  autoComplete="one-time-code"
+                  autoFocus
+                  value={twoFaCode}
+                  onChange={(e) => setTwoFaCode(e.target.value)}
+                  required
+                />
+              </label>
+              {error && <p className="auth-error">{error}</p>}
+              <button className="cta-button primary" type="submit" disabled={submitting}>
+                {submitting ? 'checking...' : 'Log In'}
+              </button>
+            </form>
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => { setRecoveryMode(!recoveryMode); setError(''); setTwoFaCode(''); }}
+            >
+              {recoveryMode ? 'use authenticator app instead' : 'lost your device? use a recovery code'}
+            </button>
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => { setStep('credentials'); setError(''); setTwoFaCode(''); setRecoveryMode(false); }}
+            >
+              use a different email
+            </button>
+          </div>
         )}
 
         {step === 'code' && (

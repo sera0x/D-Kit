@@ -105,6 +105,29 @@ await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMES
 // 'dkit-self' project (see loadSelfSettings in server.js). D-Kit configures
 // itself with D-Kit.
 await pool.query(`CREATE TABLE IF NOT EXISTS self_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TIMESTAMP DEFAULT NOW())`)
+// Two-factor auth (TOTP). The secret is stored as-is (obfuscating it client-side
+// would be theater — the server has to read it to derive codes); totp_enabled
+// flips on only after the first code verifies, so a half-finished setup can't
+// lock anyone out. Recovery codes are SHA-256 hashes, plaintext shown once.
+await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret TEXT`)
+await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN DEFAULT FALSE`)
+await pool.query(`CREATE TABLE IF NOT EXISTS recovery_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  code_hash TEXT NOT NULL,
+  used_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, code_hash)
+)`)
+// Pending second-factor challenges (password or OAuth passed, 2FA code not yet
+// given). Separate from login_codes so an email-code and a TOTP challenge can
+// never collide on the same token.
+await pool.query(`CREATE TABLE IF NOT EXISTS login_challenges (
+  login_token TEXT PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMP DEFAULT NOW() + INTERVAL '10 minutes',
+  created_at TIMESTAMP DEFAULT NOW()
+)`)
 // API keys are stored as SHA-256 hashes — the plaintext is shown once at
 // creation (or rotation) and lives only on a client. key_prefix keeps a
 // recognisable "dk_…" hint for the dashboard; key_rotated_at feeds the UI.

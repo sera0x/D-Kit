@@ -67,6 +67,9 @@ const CLI_COMMANDS = [
   ['dkit verify:send', 'Send a new email verification code.'],
   ['dkit verify <code>', 'Verify your email with the code.'],
   ['dkit verify:status', 'Check whether your email is verified.'],
+  ['dkit 2fa status', 'Show whether two-factor auth is on.'],
+  ['dkit 2fa setup / enable <code>', 'Turn 2FA on; recovery codes print once.'],
+  ['dkit 2fa disable', 'Turn 2FA off (password plus current code).'],
   ['dkit config', 'Show the logged-in user, current project, and active API key.'],
 ];
 

@@ -58,6 +58,17 @@ const { email, password } = await inquirer.prompt([{ type: 'input', name: 'email
 const spinner = ora('Initiating login...').start()
 try {
 const response = await axios.post(API_BASE + '/api/auth/login/initiate', { email, password })
+if (response.data.two_factor) {
+  spinner.succeed('Two-factor required')
+  const { code } = await inquirer.prompt([{ type: 'input', name: 'code', message: 'Authenticator or recovery code:' }])
+  const verifySpinner = ora('Verifying...').start()
+  try {
+    const verifyResponse = await axios.post(API_BASE + '/api/auth/login/verify', { login_token: response.data.login_token, code: code.trim() })
+    const config = loadConfig(); config.token = verifyResponse.data.token; config.refresh_token = verifyResponse.data.refresh_token; config.token_expires_at = Date.now() + 14 * 60 * 1000; config.user = verifyResponse.data.user; saveConfig(config)
+    verifySpinner.succeed('Logged in successfully — sessions auto-renew, no weekly re-login'); console.log('Welcome back, ' + verifyResponse.data.user.email)
+  } catch (verifyError) { verifySpinner.fail('Verification failed'); console.log(chalk.red(verifyError.response?.data?.error || verifyError.message)) }
+  return
+}
 spinner.succeed('Verification code sent to your email')
 console.log('Check your email (and spam folder) for the code.')
 const { code } = await inquirer.prompt([{ type: 'input', name: 'code', message: 'Enter verification code:' }])
@@ -75,6 +86,40 @@ try { if (config.refresh_token) await axios.post(API_BASE + '/api/auth/logout', 
 delete config.token; delete config.refresh_token; delete config.token_expires_at; delete config.user
 saveConfig(config)
 console.log(chalk.green('Logged out'))
+})
+const twofa = program.command('2fa').description('Manage two-factor authentication')
+twofa.command('status').description('Show whether 2FA is enabled').action(async () => {
+  const token = await getUserToken()
+  try { const r = await getAuthClient(token).get('/api/auth/2fa/status'); console.log('2FA ' + (r.data.enabled ? 'enabled' : 'disabled') + (r.data.enabled ? ' — ' + r.data.unused_recovery_codes + ' unused recovery code(s)' : '')) }
+  catch (error) { console.log(chalk.red(error.response?.data?.error || error.message)) }
+})
+twofa.command('setup').description('Start 2FA setup; prints the secret for your authenticator app').action(async () => {
+  const token = await getUserToken()
+  const spinner = ora('Generating secret...').start()
+  try {
+    const r = await getAuthClient(token).post('/api/auth/2fa/setup')
+    spinner.succeed('Add this secret to your authenticator app (D-Kit:<your email>):')
+    console.log(chalk.bold(r.data.secret))
+    console.log(chalk.gray(r.data.otpauth_url))
+    console.log('Then run: dkit 2fa enable <code>')
+  } catch (error) { spinner.fail('Setup failed'); console.log(chalk.red(error.response?.data?.error || error.message)) }
+})
+twofa.command('enable <code>').description('Confirm setup with a 6-digit code; prints recovery codes once').action(async (code) => {
+  const token = await getUserToken()
+  const spinner = ora('Enabling...').start()
+  try {
+    const r = await getAuthClient(token).post('/api/auth/2fa/enable', { code })
+    spinner.succeed('2FA enabled. Recovery codes (shown once, each works once):')
+    r.data.recovery_codes.forEach((c) => console.log('  ' + c))
+  } catch (error) { spinner.fail('Could not enable'); console.log(chalk.red(error.response?.data?.error || error.message)) }
+})
+twofa.command('disable').description('Turn 2FA off (needs password and a current code)').action(async () => {
+  const token = await getUserToken()
+  const { password } = await inquirer.prompt([{ type: 'password', name: 'password', message: 'Password:' }])
+  const { code } = await inquirer.prompt([{ type: 'input', name: 'code', message: 'Current authenticator code:' }])
+  const spinner = ora('Disabling...').start()
+  try { await getAuthClient(token).post('/api/auth/2fa/disable', { password, code }); spinner.succeed('2FA disabled') }
+  catch (error) { spinner.fail('Could not disable'); console.log(chalk.red(error.response?.data?.error || error.message)) }
 })
 program.command('projects:create <name>').description('Create a new project (starts keyless — a key is issued for CLI use)').action(async (name) => {
 const token = await getUserToken(); const spinner = ora('Creating project...').start()

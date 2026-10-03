@@ -4,9 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutGrid, KeyRound, Folder, Database, ShieldCheck,
   Eye, EyeOff, Copy, Check, ChevronLeft, Trash2, RotateCcw,
-  Mail, Search, Plus, RefreshCw, Users, Clock, Activity, ScrollText, Download, Info,
+  Mail, Search, Plus, RefreshCw, Users, Clock, Activity, ScrollText, Download, Info, Smartphone,
 } from 'lucide-react';
 import AppShell from '../components/app/AppShell';
+import QRCode from 'qrcode';
 import MetricExplorer from '../components/dash/MetricExplorer';
 import ActivityHeatmap from '../components/dash/ActivityHeatmap';
 import AdminPanel from '../components/dash/AdminPanel';
@@ -31,8 +32,138 @@ const NAV_ITEMS = [
   { id: 'monitors', label: 'monitors', Icon: Activity },
   { id: 'projects', label: 'projects', Icon: Folder },
   { id: 'teams', label: 'teams', Icon: Users },
+  { id: 'security', label: 'security', Icon: Smartphone },
   { id: 'admin', label: 'admin', Icon: ShieldCheck },
 ];
+
+// Two-factor (TOTP) management: link QR, live-code confirmation, recovery
+// codes shown once, and a disable path that demands the password plus a
+// current code (a stolen browser session alone can't turn 2FA off).
+function SecuritySection({ token }) {
+  const [status, setStatus] = useState(null);
+  const [setup, setSetup] = useState(null); // { secret, otpauth_url, qr }
+  const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
+  const [recoveryCodes, setRecoveryCodes] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [note, setNote] = useState('');
+
+  const load = useCallback(() => {
+    api.twofaStatus(token).then(setStatus).catch((e) => setError(e.message || 'Could not load 2FA status'));
+  }, [token]);
+  useEffect(load, [load]);
+
+  const startSetup = async () => {
+    setBusy(true); setError('');
+    try {
+      const s = await api.twofaSetup(token);
+      // Rendered locally on purpose: the otpauth URL embeds the TOTP secret,
+      // and it never leaves the machine for a third-party QR service.
+      const qr = await QRCode.toDataURL(s.otpauth_url, { margin: 1, width: 180 });
+      setSetup({ ...s, qr });
+    } catch (e) { setError(e.message || 'Setup failed'); } finally { setBusy(false); }
+  };
+
+  const confirmEnable = async (e) => {
+    e.preventDefault();
+    setBusy(true); setError('');
+    try {
+      const r = await api.twofaEnable(token, code.trim());
+      setStatus({ enabled: true });
+      setRecoveryCodes(r.recovery_codes);
+      setSetup(null); setCode('');
+    } catch (e) { setError(e.message || 'Could not enable 2FA'); } finally { setBusy(false); }
+  };
+
+  const confirmDisable = async (e) => {
+    e.preventDefault();
+    setBusy(true); setError('');
+    try {
+      await api.twofaDisable(token, password, code.trim());
+      setStatus({ enabled: false, unused_recovery_codes: 0 });
+      setPassword(''); setCode(''); setNote('Two-factor disabled.');
+    } catch (e) { setError(e.message || 'Could not disable 2FA'); } finally { setBusy(false); }
+  };
+
+  if (!status) return <p className="page-header-sub">Loading…</p>;
+
+  return (
+    <>
+      <div className="form-section first">
+        <h3 className="form-title">Two-factor authentication</h3>
+        <p className="field-hint">
+          A rotating 6-digit code from an authenticator app (Aegis, 1Password,
+          Google Authenticator) on top of your password. Recovery codes let you
+          back in if you lose the device.
+        </p>
+        {error && <p className="auth-error" style={{ margin: 0 }}>{error}</p>}
+        {note && <p className="field-hint" style={{ color: 'var(--accent)' }}>{note}</p>}
+
+        {status.enabled && (
+          <p className="field-hint" style={{ margin: 0 }}>
+            Enabled. {status.unused_recovery_codes} unused recovery code{status.unused_recovery_codes === 1 ? '' : 's'} left.
+          </p>
+        )}
+
+        {!status.enabled && !setup && (
+          <div className="form-actions">
+            <button className="cta-button primary" disabled={busy} onClick={startSetup}>Set up 2FA</button>
+          </div>
+        )}
+
+        {!status.enabled && setup && (
+          <div style={{ display: 'grid', gap: '0.8rem', justifyItems: 'start' }}>
+            <p className="field-hint" style={{ margin: 0 }}>Scan with your authenticator app, or paste the key:</p>
+            <img src={setup.qr} alt="QR code with the D-Kit two-factor secret" width="180" height="180"
+              style={{ borderRadius: 8, background: '#fff', padding: 6 }} />
+            <code style={{ fontSize: '0.8rem' }}>{setup.secret}</code>
+            <form onSubmit={confirmEnable} style={{ display: 'grid', gap: '0.6rem', justifyItems: 'start' }}>
+              <label className="field" style={{ gap: '0.3rem' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Enter the current 6-digit code</span>
+                <input type="text" inputMode="numeric" autoComplete="one-time-code"
+                  style={{ width: '10rem' }} value={code} maxLength={6}
+                  onChange={(e) => setCode(e.target.value)} required />
+              </label>
+              <div className="form-actions">
+                <button className="cta-button primary" type="submit" disabled={busy || code.trim().length !== 6}>Enable 2FA</button>
+                <button className="cta-button ghost" type="button" onClick={() => { setSetup(null); setCode(''); setError(''); }}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {status.enabled && (
+          <form onSubmit={confirmDisable} style={{ display: 'grid', gap: '0.6rem', justifyItems: 'start' }}>
+            <label className="field" style={{ gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Password</span>
+              <input type="password" autoComplete="current-password" style={{ width: '14rem' }}
+                value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </label>
+            <label className="field" style={{ gap: '0.3rem' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Current authenticator code</span>
+              <input type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6}
+                style={{ width: '10rem' }} value={code} onChange={(e) => setCode(e.target.value)} required />
+            </label>
+            <div className="form-actions">
+              <button className="cta-button danger" type="submit" disabled={busy}>Turn off 2FA</button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {recoveryCodes && (
+        <div className="form-section">
+          <h3 className="form-title">Recovery codes</h3>
+          <p className="field-hint">Shown once. Each works once, in place of the authenticator code.</p>
+          <div className="recovery-codes">
+            {recoveryCodes.map((c) => <code key={c}>{c}</code>)}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 const fmtDate = (iso) => {
   if (!iso) return '';
@@ -1237,6 +1368,7 @@ export default function Dashboard({ onNavigate }) {
             </>
           )}
 
+          {section === 'security' && <SecuritySection token={token} />}
           {section === 'teams' && (
             <>
               <PageHeader Icon={Users} title="Teams" />

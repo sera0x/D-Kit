@@ -2583,3 +2583,22 @@
 .dash-main .dash-filter input[type='text'] { padding-left: 2.6rem; }
 .dash-filter .filter-icon { left: 0.95rem; }
 .project-row .paste-key-row { grid-column: 1 / -1; }
+
+/* 2FA recovery codes: one-time secrets, so they read like data (mono, boxed)
+   and copy cleanly. Grid keeps them scannable in pairs. */
+.recovery-codes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.4rem;
+}
+.recovery-codes code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+  text-align: center;
+  user-select: all;
+}

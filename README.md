@@ -88,6 +88,7 @@ The CLI and the dashboard are two clients of the same API, and neither one is a 
 | `dkit cron:runs <name>` / `cron:pause` / `cron:rm` | Run history, pause, delete |
 | `dkit monitor:add <name> <url>` | Watch a URL; email on down and on recovery |
 | `dkit logs:ship` / `logs:tail` | Ship lines or JSON batches; tail with filters |
+| `dkit 2fa status / setup / enable / disable` | Manage two-factor auth for your account |
 | `dkit doctor [--fix]` | Diagnose the setup and apply the safe fixes |
 
 Full reference lives at `/docs` on your deployment.

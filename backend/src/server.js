@@ -9,6 +9,7 @@ const { sendVerificationCode, sendLoginCode, sendPasswordResetEmail, sendTeamInv
 const jobs = require('./jobs')
 const status = require('./status')
 const { isTeamMember, isTeamWriteable, projectAccessFor, sharedTeamIdsForProject, listSharedProjects } = require('./teamAccess')
+const { generateSecret, verifyTotp, otpauthUrl } = require('./totp')
 const crypto = require('crypto')
 const app = express()
 // ---------------------------------------------------------------------------
@@ -183,6 +184,14 @@ if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid cred
 const valid = await verifyPassword(password, result.rows[0].password_hash)
 if (!valid) return res.status(401).json({ error: 'Invalid credentials' })
 if (result.rows[0].suspended) return res.status(403).json({ error: 'Account suspended', code: 'suspended' })
+// 2FA accounts skip the email code: the authenticator app IS the second
+// factor. The response shape stays compatible (login_token) so both clients
+// just get one extra step instead of a new flow.
+if (result.rows[0].totp_enabled) {
+  const loginToken = crypto.randomBytes(32).toString('hex')
+  await pool.query('INSERT INTO login_challenges (login_token, user_id) VALUES ($1, $2)', [loginToken, result.rows[0].id])
+  return res.json({ login_token: loginToken, two_factor: true, message: 'Enter the code from your authenticator app' })
+}
 const code = crypto.randomInt(100000, 999999).toString()
 const loginToken = crypto.randomBytes(32).toString('hex')
 await pool.query(`INSERT INTO login_codes (user_id, code, login_token) VALUES ($1, $2, $3)`, [result.rows[0].id, code, loginToken])
@@ -193,6 +202,29 @@ res.json({ login_token: loginToken, message: 'Verification code sent to your ema
 app.post('/api/auth/login/verify', loginLimiter, async (req, res) => {
 const { login_token, code } = req.body
 if (!login_token || !code) return res.status(400).json({ error: 'Login token and code required' })
+// Two-factor challenge: login_token matches a pending challenge and code is
+// an authenticator code or a recovery code. One-shot: the challenge row is
+// consumed the moment it resolves, valid or not.
+const challenge = await pool.query('DELETE FROM login_challenges WHERE login_token = $1 AND expires_at > NOW() RETURNING user_id', [login_token])
+if (challenge.rows.length > 0) {
+  const uid = challenge.rows[0].user_id
+  const u = await pool.query('SELECT id, email, suspended, totp_secret FROM users WHERE id = $1', [uid])
+  if (u.rows.length === 0) return res.status(400).json({ error: 'Invalid or expired code' })
+  if (u.rows[0].suspended) return res.status(403).json({ error: 'Account suspended', code: 'suspended' })
+  const t = String(code || '').replace(/\s/g, '')
+  let ok = verifyTotp(u.rows[0].totp_secret, t)
+  if (!ok && /^\d{6}$/.test(t) === false && /^[0-9a-f]{10}$/i.test(t)) {
+    const h = crypto.createHash('sha256').update(t.toLowerCase()).digest('hex')
+    const rc = await pool.query('DELETE FROM recovery_codes WHERE user_id = $1 AND code_hash = $2 AND used_at IS NULL RETURNING id', [uid, h])
+    ok = rc.rows.length > 0
+  }
+  if (!ok) return res.status(400).json({ error: 'Invalid or expired code' })
+  const token = generateToken(uid)
+  const refreshToken = newRefreshToken()
+  await pool.query('INSERT INTO sessions (user_id, refresh_hash, user_agent, last_ip) VALUES ($1, $2, $3, $4)', [uid, hashRefreshToken(refreshToken), String(req.headers['user-agent'] || '').slice(0, 300), clientIp(req)])
+  await pool.query('UPDATE users SET last_ip = $1, last_login_at = NOW() WHERE id = $2', [clientIp(req), uid]).catch(() => {})
+  return res.json({ user: { id: u.rows[0].id, email: u.rows[0].email }, token, refresh_token: refreshToken, message: 'Login successful' })
+}
 const result = await pool.query(`SELECT user_id FROM login_codes WHERE login_token = $1 AND code = $2 AND expires_at > NOW()`, [login_token, code])
 if (result.rows.length === 0) return res.status(400).json({ error: 'Invalid or expired code' })
 const user = await pool.query('SELECT id, email, suspended FROM users WHERE id = $1', [result.rows[0].user_id])
@@ -224,6 +256,54 @@ app.get('/api/auth/verification-status', authenticate, async (req, res) => {
 const result = await pool.query('SELECT verified FROM email_verifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1', [req.user.id])
 const verified = result.rows[0]?.verified || false
 res.json({ verified })
+})
+
+// ---------------------------------------------------------------------------
+// Two-factor auth (TOTP). Enable: generate a secret, confirm with one live
+// code, get recovery codes once. Disable: needs password AND a current code,
+// so a stolen session can't turn 2FA off. Setup state is discarded unless
+// confirmed, so nobody can be locked out mid-setup.
+// ---------------------------------------------------------------------------
+app.get('/api/auth/2fa/status', authenticate, async (req, res) => {
+  const r = await pool.query('SELECT totp_enabled FROM users WHERE id = $1', [req.user.id])
+  const enabled = !!r.rows[0]?.totp_enabled
+  const rc = await pool.query('SELECT COUNT(*)::int AS n FROM recovery_codes WHERE user_id = $1 AND used_at IS NULL', [req.user.id])
+  res.json({ enabled, unused_recovery_codes: rc.rows[0].n })
+})
+
+app.post('/api/auth/2fa/setup', loginLimiter, authenticate, async (req, res) => {
+  const cur = await pool.query('SELECT totp_enabled FROM users WHERE id = $1', [req.user.id])
+  if (cur.rows[0]?.totp_enabled) return res.status(409).json({ error: 'Two-factor is already enabled' })
+  const secret = generateSecret()
+  await pool.query('UPDATE users SET totp_secret = $2, totp_enabled = FALSE WHERE id = $1', [req.user.id, secret])
+  res.json({ secret, otpauth_url: otpauthUrl(req.user.email, secret) })
+})
+
+app.post('/api/auth/2fa/enable', loginLimiter, authenticate, async (req, res) => {
+  const { code } = req.body
+  const u = await pool.query('SELECT email, totp_secret, totp_enabled FROM users WHERE id = $1', [req.user.id])
+  if (!u.rows[0]?.totp_secret) return res.status(400).json({ error: 'Start the setup first' })
+  if (u.rows[0].totp_enabled) return res.status(409).json({ error: 'Two-factor is already enabled' })
+  if (!verifyTotp(u.rows[0].totp_secret, code)) return res.status(400).json({ error: 'That code did not match. Wait for the next code and try again.' })
+  await pool.query('UPDATE users SET totp_enabled = TRUE WHERE id = $1', [req.user.id])
+  const codes = Array.from({ length: 8 }, () => crypto.randomBytes(5).toString('hex'))
+  await pool.query('DELETE FROM recovery_codes WHERE user_id = $1', [req.user.id])
+  for (const c of codes) {
+    await pool.query('INSERT INTO recovery_codes (user_id, code_hash) VALUES ($1, $2)', [req.user.id, crypto.createHash('sha256').update(c).digest('hex')])
+  }
+  res.json({ enabled: true, recovery_codes: codes, message: 'Two-factor enabled. Store these recovery codes now; they are shown once.' })
+})
+
+app.post('/api/auth/2fa/disable', loginLimiter, authenticate, async (req, res) => {
+  const { password, code } = req.body
+  const u = await pool.query('SELECT password_hash, totp_secret, totp_enabled FROM users WHERE id = $1', [req.user.id])
+  if (!u.rows[0]?.totp_enabled) return res.status(400).json({ error: 'Two-factor is not enabled' })
+  const pwOk = u.rows[0].password_hash ? await verifyPassword(String(password || ''), u.rows[0].password_hash) : true
+  if (!pwOk) return res.status(401).json({ error: 'Wrong password' })
+  if (!verifyTotp(u.rows[0].totp_secret, code)) return res.status(400).json({ error: 'Invalid or expired code' })
+  await pool.query('UPDATE users SET totp_enabled = FALSE, totp_secret = NULL WHERE id = $1', [req.user.id])
+  await pool.query('DELETE FROM recovery_codes WHERE user_id = $1', [req.user.id])
+  res.json({ enabled: false, message: 'Two-factor disabled' })
 })
 
 // API key rotation: a fresh key is generated and returned ONCE; the old key
@@ -912,8 +992,15 @@ userResult = created
 }
 const user = userResult.rows[0]
 const redirectBase = process.env.PUBLIC_URL || 'http://localhost:' + PORT
-const banned = await pool.query('SELECT suspended FROM users WHERE id = $1', [user.id])
+const banned = await pool.query('SELECT suspended, totp_enabled FROM users WHERE id = $1', [user.id])
 if (banned.rows[0]?.suspended) return res.redirect(redirectBase + '/suspended')
+// 2FA accounts can't ride an OAuth login straight in: park a challenge and
+// send the browser to the login card that asks for the authenticator code.
+if (banned.rows[0]?.totp_enabled) {
+  const loginToken = crypto.randomBytes(32).toString('hex')
+  await pool.query('INSERT INTO login_challenges (login_token, user_id) VALUES ($1, $2)', [loginToken, user.id])
+  return res.redirect(redirectBase + '/login?challenge=' + loginToken)
+}
 const token = generateToken(user.id)
 const refresh_token = (await issueSession(user.id, req)).refresh_token
 const payload = encodeURIComponent(JSON.stringify({ id: user.id, email: user.email, refresh_token }))

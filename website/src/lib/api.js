@@ -178,6 +178,14 @@ loginInitiate: (email, password) =>
 request('/auth/login/initiate', { method: 'POST', body: JSON.stringify({ email, password }) }),
 loginVerify: (login_token, code) =>
 request('/auth/login/verify', { method: 'POST', body: JSON.stringify({ login_token, code }) }),
+twofaStatus: (token) =>
+request('/auth/2fa/status', { headers: { Authorization: `Bearer ${token}` } }),
+twofaSetup: (token) =>
+request('/auth/2fa/setup', { method: 'POST', headers: { Authorization: `Bearer ${token}` } }),
+twofaEnable: (token, code) =>
+request('/auth/2fa/enable', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ code }) }),
+twofaDisable: (token, password, code) =>
+request('/auth/2fa/disable', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ password, code }) }),
 forgotPassword: (email) =>
 request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
 resetPassword: (token, password) =>
