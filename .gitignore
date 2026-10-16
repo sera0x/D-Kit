@@ -41,7 +41,27 @@ skills-lock.json
 /dkit-style-guide.md
 /MIGRATION.md
 /CHANGES.md
+/VPS-SETUP.md
 /scripts/migrate-export.sh
 /scripts/migrate-bootstrap.sh
 /scripts/update.sh
 /releases/
+
+# Migration bundle artifacts. The extracted archive carries the Postgres
+# dump, backend/.env, the GitHub SSH key and the Cloudflare tunnel
+# credentials — extracting it inside the repo must never lead to a commit.
+/dkit-migration-*/
+/env/
+/ssh/
+/cloudflared/
+/pm2/
+/nginx/
+/crontab.txt
+/versions.txt
+*.pem
+*.key
+*.sql
+*.sql.gz
+id_rsa
+id_ed25519
+*_ed25519
