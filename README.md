@@ -2,7 +2,7 @@
 # dkit — secrets, cron, monitors and a log drain, self-hosted.
 # one CLI, one dashboard, one API.
 
-$ curl -fsSL https://raw.githubusercontent.com/sera0x/D-Kit/main/install.sh | sh
+$ curl -fsSL https://raw.githubusercontent.com/sera0x/Dkit/main/install.sh | sh
 
 $ dkit login
 Email: you@work.dev
@@ -73,7 +73,7 @@ Teams get owner, admin and member roles, projects shared into a team, and invita
 ## Run it on your own box
 
 ```bash
-git clone https://github.com/sera0x/D-Kit.git
+git clone https://github.com/sera0x/Dkit.git
 cd D-Kit
 cp backend/.env.example backend/.env     # fill in the three values below
 ./scripts/start.sh
@@ -87,7 +87,6 @@ That brings up the API serving the dashboard on `localhost:3001`. The database s
 | `JWT_SECRET` | Signs session tokens — `openssl rand -hex 32` |
 | `RESEND_API_KEY` | Sends verification codes, invites and uptime alerts |
 
-OAuth is optional: the Google and GitHub buttons stay hidden until both ID and secret are set. A step-by-step VPS checklist is in [VPS-SETUP.md](VPS-SETUP.md), and [MIGRATION.md](MIGRATION.md) moves the whole stack to a new VPS with one archive.
 
 ## Every command, one screen
 
